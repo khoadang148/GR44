@@ -1,38 +1,24 @@
-import { faBook, faBorderAll } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowDown,
+  faArrowUp,
+  faBook,
+  faBorderAll,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Image } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllCourses } from "../redux/actions/course.action";
 
 const DashBoard = ({ sidebar }) => {
-  const latestcourse = [
-    {
-      image:
-        "https://gambolthemes.net/html-items/cursus-new-demo/images/courses/img-1.jpg",
-      title: "Complete Python Bootcamp: Go from zero to hero in Python 3",
-      time: "First 2 days 22 hours",
-      view: "100k",
-      purchased: "200",
-      like: "1k",
-    },
-    {
-      image:
-        "https://gambolthemes.net/html-items/cursus-new-demo/images/courses/img-2.jpg",
-      title: "The Complete JavaScript Course 2020: Build Real Projects!",
-      time: "First 2 days 22 hours  ",
-      view: "100k",
-      purchased: "200",
-      like: "1k",
-    },
-    {
-      image:
-        "https://gambolthemes.net/html-items/cursus-new-demo/images/courses/img-3.jpg",
-      title: "Beginning C++ Programming - From Beginner to Beyond",
-      time: "First 2 days 22 hours",
-      view: "100k",
-      purchased: "200",
-      like: "1k",
-    },
-  ];
+  const { courses, loading, error } = useSelector(
+    (state) => state.enrolledCourses
+  );
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getAllCourses());
+  }, [dispatch]);
+
   const news2 = [
     {
       image:
@@ -63,7 +49,7 @@ const DashBoard = ({ sidebar }) => {
     setCurrentNewsIndex((prevIndex) => (prevIndex + 1) % news2.length);
   };
   const handleNextt = () => {
-    setCurrentNewsIndexx((prevIndex) => (prevIndex + 1) % latestcourse.length);
+    setCurrentNewsIndexx((prevIndex) => (prevIndex + 1) % courses.length);
   };
 
   const handlePrev = () => {
@@ -73,7 +59,7 @@ const DashBoard = ({ sidebar }) => {
   };
   const handlePrevv = () => {
     setCurrentNewsIndexx((prevIndex) =>
-      prevIndex === 0 ? latestcourse.length - 1 : prevIndex - 1
+      prevIndex === 0 ? courses.length - 1 : prevIndex - 1
     );
   };
 
@@ -84,9 +70,9 @@ const DashBoard = ({ sidebar }) => {
           sidebar ? "ml-[30px]" : "ml-[-200px]"
         } overflow-x-hidden`}
       >
-        <div className="flex items-center">
-          <FontAwesomeIcon icon={faBorderAll} className="text-xl" />
-          <h1 className="ml-2">Dashboard</h1>
+        <div className="flex items-center pt-2 pb-3">
+          <FontAwesomeIcon icon={faBorderAll} className="text-xl mb-2" />
+          <h1 className="ml-2 text-[20px]"> Instructor Dashboard</h1>
         </div>
         <div className="grid grid-cols-4 gap-4 mt-3">
           {[
@@ -100,15 +86,15 @@ const DashBoard = ({ sidebar }) => {
             },
             {
               title: "Total Enroll",
-              amount: "$350",
+              amount: "1500",
               new: "New 5",
               imgSrc:
                 "https://gambolthemes.net/html-items/cursus-new-demo/images/dashboard/graduation-cap.svg",
-              bgColor: "bg-purple-500",
+              bgColor: "bg-purple-400",
             },
             {
               title: "Total Courses",
-              amount: "$350",
+              amount: "130",
               new: "New 5",
               imgSrc:
                 "https://gambolthemes.net/html-items/cursus-new-demo/images/dashboard/online-course.svg",
@@ -116,11 +102,11 @@ const DashBoard = ({ sidebar }) => {
             },
             {
               title: "Total Students",
-              amount: "$350",
+              amount: "2650",
               new: "New 5",
               imgSrc:
                 "https://gambolthemes.net/html-items/cursus-new-demo/images/dashboard/knowledge.svg",
-              bgColor: "bg-purple-500",
+              bgColor: "bg-purple-400",
             },
           ].map((item, index) => (
             <div
@@ -133,7 +119,7 @@ const DashBoard = ({ sidebar }) => {
                 </h5>
                 <h3 className="text-[24px] text-[#333333]">{item.amount}</h3>
                 <span
-                  className={`text-[12px] px-[8px] py-[5px] ${item.bgColor} font-medium rounded-sm`}
+                  className={`text-[12px] text-white px-[8px] py-[5px] ${item.bgColor} font-medium rounded-sm`}
                 >
                   {item.new}
                 </span>
@@ -143,8 +129,8 @@ const DashBoard = ({ sidebar }) => {
           ))}
         </div>
         <div className="h-[120px] w-full bg-white mt-7 flex justify-between items-center text-[24px] px-5">
-          <div className="flex items-center gap-8">
-            <FontAwesomeIcon icon={faBook} className="text-[30px]" />
+          <div className="flex  items-center gap-5 ml-3 text-gray-600">
+            <FontAwesomeIcon icon={faBook} className="text-[24px] mb-2" />
             <h1 className="text-[24px] font-normal">
               Jump Into Course Creation
             </h1>
@@ -156,10 +142,10 @@ const DashBoard = ({ sidebar }) => {
         <div className="flex mt-7">
           <div className="flex-1">
             <div className="flex items-start mb-3">
-              <h1 className="text-[16px]">Latest Courses Performance</h1>
+              <h1 className="text-[17px]">Latest Courses Performance</h1>
               <div
                 className={`flex items-end gap-2 justify-end ${
-                  sidebar ? "ml-[100px]" : "ml-[150px]"
+                  sidebar ? "ml-[100px]" : "ml-[130px]"
                 }`}
               >
                 <Button
@@ -175,24 +161,24 @@ const DashBoard = ({ sidebar }) => {
                 </Button>
                 <Button
                   className={`px-2 py-1 bg-white text-center rounded ${
-                    currentNewsIndexx === latestcourse.length - 1
+                    currentNewsIndexx === courses.length - 1
                       ? "opacity-50 cursor-not-allowed"
                       : ""
                   }`}
                   onClick={handleNextt}
-                  disabled={currentNewsIndexx === latestcourse.length - 1}
+                  disabled={currentNewsIndexx === courses.length - 1}
                 >
                   &gt;
                 </Button>
               </div>
             </div>
-            {latestcourse.map(
-              (item, index) =>
+            {courses.map(
+              (course, index) =>
                 index === currentNewsIndexx && (
                   <div
                     key={index}
                     className={`bg-white ${
-                      sidebar ? "h-[600px] w-[400px]" : "h-[600px] w-[400px]"
+                      sidebar ? "h-[600px] w-[ 400px]" : "h-[600px] w-[400px]"
                     }`}
                   >
                     <div
@@ -206,30 +192,30 @@ const DashBoard = ({ sidebar }) => {
                             ? "w-[440px] h-[270px]"
                             : "w-[440px] h-[270px]"
                         }`}
-                        src={item.image}
+                        src={course.thumbnail}
                       />
                     </div>
-                    <div className="ml-3 pt-2 ">
-                      <span>{item.time}</span>
+                    <div className="ml-3 pt-2 text-[12px] font-normal text-[#686f7a] ">
+                      <span>{course.time}</span>
                     </div>
-                    <h1 className="mt-5 ml-3 text-[18px]">{item.title}</h1>
-                    {/* <div className="mt-4 ml-3 text-md">{item.description}</div> */}
-                    <div className=" w-[350px] mt-2 ml-3 text-[14px] font-medium space-y-3 text-gray-500">
+                    <h1 className="mt-5 ml-3 text-[18px]">{course.title}</h1>
+
+                    <div className=" w-[350px] mt-2 ml-3 text-[14px] font-normal space-y-6 text-[#686f7a]">
                       <div className=" flex justify-between">
                         <div>View</div>
-                        <div>{item.view}</div>
+                        <div>{course.views}</div>
                       </div>
                       <div className=" flex justify-between">
                         <div>Purchased</div>
-                        <div>{item.purchased}</div>
+                        <div>{course.purchased}</div>
                       </div>
                       <div className=" flex justify-between">
                         <div>Like</div>
-                        <div>{item.like}</div>
+                        <div>{course.total_like}</div>
                       </div>
                     </div>
                     <hr className="mt-6 w-[85%] ml-6"></hr>
-                    <div className="flex flex-col space-y-2 p-4">
+                    <div className="flex flex-col space-y-4 p-4 text-[14px]">
                       <a
                         href="#"
                         className="text-black font-medium hover:underline"
@@ -255,7 +241,7 @@ const DashBoard = ({ sidebar }) => {
           </div>
           <div className="flex-1 ml-5">
             <div className="flex items-start mb-3 gap-[140px]">
-              <h1 className="text-[16px]">News</h1>
+              <h1 className="text-[17px]">News</h1>
               <div
                 className={`flex items-center gap-2 justify-end ${
                   sidebar ? "ml-[100px]" : "ml-[150px]"
@@ -317,21 +303,90 @@ const DashBoard = ({ sidebar }) => {
                 )
             )}
           </div>
-          <div className="flex-1 ml-5">
-            <div className="text-xl font-semibold mb-4 ">Profile Analytics</div>
-            <div  className="mt-[1px] w-full h-[300px] bg-white">
-            <div className=" p-4 space-y-4">
-            <h6 className="text-[14px] text-[#686f7a]">Current Subcribers</h6>
-            <h3 className="text-[24px] text-black">999</h3>
+          <div className="flex-1 ml-5 ">
+            <div className="text-[18px] font-semibold mb-4 ">
+              Profile Analytics
             </div>
-            <hr></hr>
+            <div className="mt-[1px] w-[410px] h-[300px] bg-white">
+              <div className=" p-4 space-y-4">
+                <h6 className="text-[14px] text-[#686f7a]">
+                  Current Subcribers
+                </h6>
+                <h3 className="text-[24px] text-black">999</h3>
+              </div>
+              <hr className="mt-2 ml-2 w-[380px] "></hr>
+              <div className=" w-[350px] mt-2 ml-4 text-[14px] font-normal space-y-3 text-gray-500">
+                <div className=" flex justify-between">
+                  <div>View</div>
+                  <div className="flex gap-3">
+                    <p>17k</p>
+                    <p className="text-red-600">
+                      <FontAwesomeIcon icon={faArrowDown} />
+                    </p>
+                    <p className="text-red-600">75%</p>
+                  </div>
+                </div>
+                <div className=" flex justify-between">
+                  <div className="flex gap-1">
+                    <p>Purchased </p>
+                    <p>(per hour)</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <p>1</p>
+                    <p className="text-red-600">
+                      <FontAwesomeIcon icon={faArrowUp} />
+                    </p>
+                    <p className="text-red-600">100%</p>
+                  </div>
+                </div>
+                <div className=" flex justify-between">
+                  <div>Like</div>
+                  <div className="flex gap-3">
+                    <p>50</p>
+                    <p className="text-red-600">
+                      <FontAwesomeIcon icon={faArrowUp} />
+                    </p>
+                    <p className="text-red-600">70%</p>
+                  </div>
+                </div>
+                <hr className="mt-7 w-[380px] "></hr>
+                <div>
+                  <a
+                    href="#"
+                    className="text-black font-medium hover:underline"
+                  >
+                    GO TO COURSE ANALYTICS
+                  </a>
+                </div>
+              </div>
+            </div>
 
+            <div className="text-[18px] font-semibold mb-4 mt-7 ">
+              Submit Courses
             </div>
-            <div className="text-xl font-semibold mb-4">
+            <div className="mt-[1px] w-[410px] h-[150px] bg-white">
+              <div className="p-3">
+                <a href="#" className="font-medium text-[17px]">
+                  The Complete JavaScript Course 2020: Build Real Projects!
+                  <span className="px-[10px] py-[3px] bg-red-600 text-white rounded-md ml-3 text-[12px]">
+                    Pending
+                  </span>
+                </a>
+                <p className="mt-5 text-[15px] text-gray-500 font-normal">
+                  Submitted
+                  <span className="ml-2">1 days ago</span>
+                </p>
+                <a href="#" className="hover:underline text-[16px] font-normal">
+                  Delete
+                </a>
+              </div>
+            </div>
+
+            <div className="text-[18px] font-semibold mb-4 mt-7">
               What's new in Cursus?
             </div>
             {news2.map((item, index) => (
-              <div key={index} className="mt-[1px] w-full h-[50px] bg-white">
+              <div key={index} className="mt-[1px] w-[410px] h-[50px] bg-white">
                 <h1 className="items-center pt-4 pl-4 font-light text-sm">
                   {item.title}
                 </h1>
