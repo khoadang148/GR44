@@ -1,9 +1,34 @@
 import { faDollarSign } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getEarning } from "../redux/actions/earning.action";
+
 
 const Earning = ({ sidebar }) => {
+  const userId = useSelector((state) => state.auth.id);
+  const dispatch = useDispatch();
+  const { earning , loading } = useSelector((state) => state.earning);
+  
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [totalEarning, setTotalEarning] = useState(0);
+  const [totalEarningBeforeTax, setTotalEarningBeforeTax] = useState(0);
+  const taxRate = 0.15; // ví dụ thuế là 15%
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(getEarning(userId));
+    }
+  }, [dispatch, userId]);
+
+  useEffect(() => {
+    if (earning) {
+      const total = earning.reduce((acc, item) => acc + parseFloat(item.earning.replace('$', '')), 0);
+      setTotalEarning(total.toFixed(2));
+      const beforeTax = total / (1 + taxRate);
+      setTotalEarningBeforeTax(beforeTax.toFixed(2));
+    }
+  }, [earning]);
 
   const handleMouseEnter = () => {
     setDropdownOpen(true);
@@ -24,19 +49,7 @@ const Earning = ({ sidebar }) => {
     { key: "8", country: "Thailand", price: "$5" },
   ];
 
-  const data2 = [
-    { key: "1", date: "1, Wednesday", itemcount: "3", earning: "$120.50" },
-    { key: "2", date: "2, Thursday", itemcount: "2", earning: "$84.00" },
-    { key: "3", date: "4, Saturday", itemcount: "4", earning: "$150.50" },
-    { key: "4", date: "5, Sunday", itemcount: "3", earning: "$102.24" },
-    { key: "5", date: "6, Monday", itemcount: "2", earning: "$80.50" },
-    { key: "6", date: "7, Tuesday", itemcount: "3", earning: "$70.50" },
-    { key: "7", date: "8, Wednesday", itemcount: "5", earning: "$130.00" },
-    { key: "8", date: "9, Thursday", itemcount: "3", earning: "$95.50" },
-    { key: "9", date: "10, Friday", itemcount: "4", earning: "$152.50" },
-    { key: "10", date: "11, Saturday", itemcount: "3", earning: "$100.40" },
-    { key: "11", date: "12, Sunday", itemcount: "2", earning: "$60.14" },
-  ];
+ 
 
   return (
     <div
@@ -55,13 +68,13 @@ const Earning = ({ sidebar }) => {
               Sales earnings this month (April), after edututs+ fees, & before
               taxes:
             </p>
-            <p className="text-[30px] font-bold text-center">$1146.78</p>
+            <p className="text-[30px] font-bold text-center">${totalEarning}</p>
           </div>
         </div>
         <div className="col-span-1 rounded-sm bg-[#333333] text-white font-medium p-6">
           <div className="flex flex-col justify-between h-full">
             <p className="text-[14px] font-normal text-center">Your balance:</p>
-            <p className="text-[30px] font-bold text-center">$1146.78</p>
+            <p className="text-[30px] font-bold text-center">${totalEarning}</p>
           </div>
         </div>
         <div className="col-span-1 rounded-sm bg-[#333333] text-white font-medium p-6">
@@ -69,7 +82,7 @@ const Earning = ({ sidebar }) => {
             <p className="text-[14px] font-normal text-center">
               Total value of your sales, before taxes:
             </p>
-            <p className="text-[30px] font-bold text-center">$95895.54</p>
+            <p className="text-[30px] font-bold text-center">${totalEarningBeforeTax}</p>
           </div>
         </div>
       </div>
@@ -199,20 +212,20 @@ const Earning = ({ sidebar }) => {
                 </tr>
               </thead>
               <tbody>
-                {data2.map((item) => (
+                {earning.map((earning,index) => (
                   <tr
-                    key={item.key}
+                    key={index}
                     className="border-b border-blue-gray-200 text-[14px] font-normal"
                   >
-                    <td className="py-3 px-4">{item.date}</td>
-                    <td className="py-3 px-4">{item.itemcount}</td>
-                    <td className="py-3 px-4">{item.earning}</td>
+                    <td className="py-3 px-4">{earning.date}</td>
+                    <td className="py-3 px-4">{earning.itemsalecount}</td>
+                    <td className="py-3 px-4">${earning.earning}</td>
                   </tr>
                 ))}
                 <tr className="border-b border-blue-gray-200 bg-[#333333] text-white">
                   <td className="py-3 px-4 font-medium">Total</td>
                   <td className="py-3 px-4"></td>
-                  <td className="py-3 px-4 font-medium">$1146.78</td>
+                  <td className="py-3 px-4 font-medium">${totalEarning}</td>
                   <td className="py-3 px-4"></td>
                 </tr>
               </tbody>
