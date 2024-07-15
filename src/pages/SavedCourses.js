@@ -4,8 +4,9 @@ import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteCourses, getEnrolledCourses } from "../redux/actions/course.action";
+
 import { Image } from "react-bootstrap";
+import { deleteEnrolledCourses, getEnrolledCourses } from "../redux/actions/course.action";
 
 const CourseCard = ({
   thumbnail,
@@ -86,7 +87,7 @@ const SavedCourses = ({ sidebar }) => {
   };
 
   const handleConfirmDelete = () => {
-    dispatch(deleteCourses(userId)); // Delete all courses
+    dispatch(deleteEnrolledCourses(userId)); // Delete all courses
     setShowDeleteConfirmation(false);
   };
 

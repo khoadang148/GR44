@@ -11,9 +11,9 @@ import {
   CREATE_COURSE_REQUEST,
   CREATE_COURSE_SUCCESS,
   CREATE_COURSE_FAILURE,
-  DELETE_SAVEDCOURSES_REQUEST,
-  DELETE_SAVEDCOURSES_SUCCESS,
-  DELETE_SAVEDCOURSES_FAILURE,
+  DELETE_ENROLLED_COURSES_REQUEST,
+  DELETE_ENROLLED_COURSES_SUCCESS,
+  DELETE_ENROLLED_COURSES_FAILURE,
 } from "../actionType";
 import {  differenceInDays, parse, isValid } from "date-fns";
 
@@ -142,9 +142,9 @@ export const createCourse = (courseData) => async (dispatch) => {
     dispatch({ type: CREATE_COURSE_FAILURE, payload: error.message });
   }
 };
-export const deleteCourses = (userId, courseId) => {
+export const deleteEnrolledCourses = (userId, courseId) => {
   return async (dispatch) => {
-    dispatch({ type: DELETE_SAVEDCOURSES_REQUEST });
+    dispatch({ type: DELETE_ENROLLED_COURSES_REQUEST });
 
     try {
       const userResponse = await axios.get(`${API_URL}/users/${userId}`);
@@ -159,7 +159,7 @@ export const deleteCourses = (userId, courseId) => {
       });
 
       dispatch({
-        type: DELETE_SAVEDCOURSES_SUCCESS,
+        type: DELETE_ENROLLED_COURSES_SUCCESS,
         payload: updatedCourses,
       });
 
@@ -175,7 +175,7 @@ export const deleteCourses = (userId, courseId) => {
       });
     } catch (error) {
       dispatch({
-        type: DELETE_SAVEDCOURSES_FAILURE,
+        type: DELETE_ENROLLED_COURSES_FAILURE,
         error: error.message,
       });
     }
