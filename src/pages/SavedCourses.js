@@ -6,7 +6,8 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Image } from "react-bootstrap";
-import { deleteEnrolledCourses, getEnrolledCourses } from "../redux/actions/course.action";
+import { deleteSavedCourses, getEnrolledCourses } from "../redux/actions/course.action";
+
 
 const CourseCard = ({
   thumbnail,
@@ -87,7 +88,7 @@ const SavedCourses = ({ sidebar }) => {
   };
 
   const handleConfirmDelete = () => {
-    dispatch(deleteEnrolledCourses(userId)); // Delete all courses
+    dispatch(deleteSavedCourses(userId)); // Delete all courses
     setShowDeleteConfirmation(false);
   };
 

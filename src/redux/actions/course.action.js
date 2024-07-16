@@ -11,30 +11,32 @@ import {
   CREATE_COURSE_REQUEST,
   CREATE_COURSE_SUCCESS,
   CREATE_COURSE_FAILURE,
-  DELETE_ENROLLED_COURSES_REQUEST,
-  DELETE_ENROLLED_COURSES_SUCCESS,
-  DELETE_ENROLLED_COURSES_FAILURE,
+  DELETE_SAVEDCOURSES_REQUEST,
+  DELETE_SAVEDCOURSES_SUCCESS,
+  DELETE_SAVEDCOURSES_FAILURE,
 } from "../actionType";
-import {  differenceInDays, parse, isValid } from "date-fns";
+import { differenceInDays, parse, isValid } from "date-fns";
 
 const API_URL = "https://667e5671297972455f67ee82.mockapi.io/projectojt/api/v1";
 
 const isRecentCourse = (courseDate, daysThreshold = 30) => {
   try {
     const today = new Date();
-    const courseParsedDate = parse(courseDate, 'dd/MM/yyyy', new Date());
-    
+    const courseParsedDate = parse(courseDate, "dd/MM/yyyy", new Date());
+
     if (!isValid(courseParsedDate)) {
-      console.error('Invalid date:', courseDate);
+      console.error("Invalid date:", courseDate);
       return false;
     }
 
     const daysDifference = differenceInDays(today, courseParsedDate);
 
-    console.log(`Course date: ${courseDate}, Parsed date: ${courseParsedDate}, Days difference: ${daysDifference}`);
+    console.log(
+      `Course date: ${courseDate}, Parsed date: ${courseParsedDate}, Days difference: ${daysDifference}`
+    );
     return daysDifference <= daysThreshold;
   } catch (error) {
-    console.error('Error parsing date:', error);
+    console.error("Error parsing date:", error);
     return false;
   }
 };
@@ -45,15 +47,17 @@ export const getAllCourses = () => {
     try {
       const coursesResponse = await axios.get(`${API_URL}/courses`);
       const allCourses = coursesResponse.data;
-      console.log('All courses data:', allCourses);
-      
-      const recentCourses = allCourses.filter(course => {
+      console.log("All courses data:", allCourses);
+
+      const recentCourses = allCourses.filter((course) => {
         console.log(`Course date: ${course.date}`);
         return isRecentCourse(course.date);
       });
-      console.log('Recent courses data:', recentCourses);
+      console.log("Recent courses data:", recentCourses);
 
-      const newestCourses = [...allCourses].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8);
+      const newestCourses = [...allCourses]
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 8);
 
       dispatch({
         type: FETCH_ENROLLED_COURSES_SUCCESS,
@@ -84,11 +88,15 @@ export const getEnrolledCourses = (userId) => {
 
     try {
       const userResponse = await axios.get(`${API_URL}/users/${userId}`);
-      const enrolledCoursesIds = userResponse.data.enrolledCourses.map(course => course.id);
+      const enrolledCoursesIds = userResponse.data.enrolledCourses.map(
+        (course) => course.id
+      );
       const coursesResponse = await axios.get(`${API_URL}/courses`, {
         params: { id: enrolledCoursesIds.join(",") },
       });
-      const filteredCourses = coursesResponse.data.filter(course => enrolledCoursesIds.includes(course.id));
+      const filteredCourses = coursesResponse.data.filter((course) =>
+        enrolledCoursesIds.includes(course.id)
+      );
 
       dispatch({
         type: FETCH_ENROLLED_COURSES_SUCCESS,
@@ -142,24 +150,24 @@ export const createCourse = (courseData) => async (dispatch) => {
     dispatch({ type: CREATE_COURSE_FAILURE, payload: error.message });
   }
 };
-export const deleteEnrolledCourses = (userId, courseId) => {
+export const deleteSavedCourses = (userId, courseId) => {
   return async (dispatch) => {
-    dispatch({ type: DELETE_ENROLLED_COURSES_REQUEST });
+    dispatch({ type: DELETE_SAVEDCOURSES_REQUEST });
 
     try {
       const userResponse = await axios.get(`${API_URL}/users/${userId}`);
-      const enrolledCourses = userResponse.data.enrolledCourses;
+      const savedCourses = userResponse.data.savedCourses;
 
-      const updatedCourses = enrolledCourses.filter(
+      const updatedCourses = savedCourses.filter(
         (course) => course.id !== courseId
       );
 
       await axios.put(`${API_URL}/users/${userId}`, {
-        enrolledCourses: updatedCourses,
+        savedCourses: updatedCourses,
       });
 
       dispatch({
-        type: DELETE_ENROLLED_COURSES_SUCCESS,
+        type: DELETE_SAVEDCOURSES_SUCCESS,
         payload: updatedCourses,
       });
 
@@ -175,9 +183,11 @@ export const deleteEnrolledCourses = (userId, courseId) => {
       });
     } catch (error) {
       dispatch({
-        type: DELETE_ENROLLED_COURSES_FAILURE,
+        type: DELETE_SAVEDCOURSES_FAILURE,
         error: error.message,
       });
     }
   };
 };
+
+

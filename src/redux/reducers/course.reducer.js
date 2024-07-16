@@ -10,9 +10,9 @@ import {
   CREATE_COURSE_FAILURE,
   CREATE_COURSE_SUCCESS,
   CREATE_COURSE_REQUEST,
-  DELETE_ENROLLED_COURSES_REQUEST,
-  DELETE_ENROLLED_COURSES_SUCCESS,
-  DELETE_ENROLLED_COURSES_FAILURE,
+  DELETE_SAVEDCOURSES_REQUEST,
+  DELETE_SAVEDCOURSES_SUCCESS,
+  DELETE_SAVEDCOURSES_FAILURE,
   
 } from "../actionType";
 
@@ -88,19 +88,19 @@ const enrolledCoursesReducer = (state = initialState, action) => {
           ...state, 
           loading: false, 
           error: action.payload };
-          case DELETE_ENROLLED_COURSES_REQUEST:
+          case DELETE_SAVEDCOURSES_REQUEST:
       return {
         ...state,
         loading: true,
         error: null,
       };
-    case DELETE_ENROLLED_COURSES_SUCCESS:
+    case DELETE_SAVEDCOURSES_SUCCESS:
       return {
         ...state,
         loading: false,
         courses: action.payload,
       };
-    case DELETE_ENROLLED_COURSES_FAILURE:
+    case DELETE_SAVEDCOURSES_FAILURE:
       return {
         ...state,
         loading: false,
