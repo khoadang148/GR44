@@ -8,6 +8,9 @@ import {
   SET_ROLE,
   SET_USER,
   SET_ID,
+  FORGOT_PASSWORD_REQUEST,
+  FORGOT_PASSWORD_SUCCESS,
+  FORGOT_PASSWORD_FAILURE
 
 } from "../actionType";
 
@@ -18,8 +21,12 @@ const initialState = {
   error: null,
   loading: false,
   id: Cookies.get("id") || null,
-  avatar: Cookies.get("avatar") || null, // Ensure avatar is loaded from cookies
-  username: Cookies.get("username") || null
+  avatar: Cookies.get("avatar") || null,
+  username: Cookies.get("username") || null,
+  forgotPassword: {
+    defaultPassword: null,
+    error: null,
+  }
 };
 
 const authReducer = (state = initialState, action) => {
@@ -69,10 +76,37 @@ const authReducer = (state = initialState, action) => {
         ...state,
         id: Cookies.get("id"),
       };
-    
+      case FORGOT_PASSWORD_REQUEST:
+      return {
+        ...state,
+        forgotPassword: {
+          ...state.forgotPassword,
+          loading: true,
+          error: null,
+        }
+      };
+    case FORGOT_PASSWORD_SUCCESS:
+      return {
+        ...state,
+        forgotPassword: {
+          ...state.forgotPassword,
+          loading: false,
+          defaultPassword: action.payload.defaultPassword,
+        }
+      };
+    case FORGOT_PASSWORD_FAILURE:
+      return {
+        ...state,
+        forgotPassword: {
+          ...state.forgotPassword,
+          loading: false,
+          error: action.payload.error,
+        }
+      };
     default:
       return state;
   }
 };
+
 
 export default authReducer;

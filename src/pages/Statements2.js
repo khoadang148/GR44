@@ -3,13 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch, useSelector } from "react-redux";
 import { getStatements } from "../redux/actions/statements.action";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-const Statements2 = ({ sidebar }) => {
+const Statements2= ({ sidebar }) => {
   const userId = useSelector((state) => state.auth.id);
   const dispatch = useDispatch();
   const { statements, loading } = useSelector((state) => state.statements);
-  const navigate = useNavigate(); // Import useNavigate
 
   const [monthFilter, setMonthFilter] = useState("This Month");
   const [filteredStatements, setFilteredStatements] = useState([]);
@@ -37,7 +36,7 @@ const Statements2 = ({ sidebar }) => {
         ? statement.orderId.includes(searchTerm)
         : true;
 
-      return matchesMonth && matchesSearch;
+      return matchesMonth && matchesSearch && statement.role === "teacher";
     });
 
     setFilteredStatements(filtered);
@@ -45,7 +44,7 @@ const Statements2 = ({ sidebar }) => {
 
   const handleSearch = () => {
     if (!searchDocNumber.trim()) {
-      setFilteredStatements(statements);
+      setFilteredStatements(statements.filter(statement => statement.role === "teacher"));
       return;
     }
 
@@ -57,15 +56,12 @@ const Statements2 = ({ sidebar }) => {
       return (
         statementDate.getDate() === searchDate.getDate() &&
         statementDate.getMonth() === searchDate.getMonth() &&
-        statementDate.getFullYear() === searchDate.getFullYear()
+        statementDate.getFullYear() === searchDate.getFullYear() &&
+        statement.role === "teacher"
       );
     });
 
     setFilteredStatements(filtered);
-  };
-
-  const handleBecomeInstructor = () => {
-    navigate("/signup");
   };
 
   if (loading) {
@@ -85,13 +81,20 @@ const Statements2 = ({ sidebar }) => {
         <div className="flex flex-col md:flex-row gap-6 p-3">
           <div className="md:w-2/3 rounded-sm bg-white text-black font-medium p-4">
             <h2 className="text-xl font-semibold mb-4">Earnings</h2>
-            <h1 className="text-gray-500">If you are not an instructor, you can't use this section.</h1>
-            <button
-              className="bg-red-600 text-white font-bold py-2 px-4 rounded mt-4"
-              onClick={handleBecomeInstructor} // Attach the function here
-            >
-              Become a Instructor
-            </button>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="col-span-1">
+                <p>My funds</p>
+                <p className="text-lg font-bold">$289.64</p>
+              </div>
+              <div className="col-span-1 px-2">
+                <p>Earnings</p>
+                <p className="text-lg font-bold text-green-600">+ $458.00</p>
+              </div>
+              <div className="col-span-1 pl-2">
+                <p>Cursus Fees</p>
+                <p className="text-lg font-bold text-red-600">- $154.86</p>
+              </div>
+            </div>
           </div>
 
           <div className="md:w-1/3 rounded-sm bg-white text-black font-medium p-2">

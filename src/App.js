@@ -142,14 +142,18 @@ const App = () => {
     if (
       tokenFromCookie &&
       !window.location.pathname.includes("/signup") &&
-      !window.location.pathname.includes("/forgot-password")
+      !window.location.pathname.includes("/forgot-password") &&
+      !window.location.pathname.includes("/signupstep") &&
+      !window.location.pathname.includes("/term")
     ) {
       dispatch(setToken(tokenFromCookie));
       dispatch(setRole(tokenFromCookie));
       dispatch(setID(idFromCookie));
     } else if (
       !window.location.pathname.includes("/signup") &&
-      !window.location.pathname.includes("/forgot-password")
+      !window.location.pathname.includes("/forgot-password") &&
+      !window.location.pathname.includes("/signupstep") &&
+      !window.location.pathname.includes("/term")
     ) {
       navigate("/login");
     }
@@ -171,6 +175,8 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/signup" element={<SignupScreen />} />
+        <Route path="/term" element={<Term/>} />
+        <Route path="/signupstep" element={<SignupStep />} />
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
         <Route
           path="/home"
@@ -205,6 +211,16 @@ const App = () => {
                   <ExploreScreen sidebar={sidebar} />
                 </Layout>
               </>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/term"
+          element={
+            token ? (
+                  <Term />
             ) : (
               <Navigate to="/login" />
             )

@@ -22,7 +22,6 @@ const Review = ({ sidebar }) => {
     useEffect(() => {
       const timer = setTimeout(() => {
         if (searchQuery) {
-          console.log(searchQuery);
           dispatch(searchReview(userId, searchQuery));
         } else {
           dispatch(getAllReviews(userId));
@@ -131,7 +130,6 @@ const Review = ({ sidebar }) => {
                   value={searchQuery}
                   onChange={handleInputChange}
                 />
-                
                 <button 
                   className='bg-red-500 p-1.5 hover:bg-[#333333] transition duration-300'
                 >

@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom"; 
+import { useNavigate, Link } from "react-router-dom";
 import { Form, Input, Button, Checkbox } from "antd";
-import { login } from "../redux/actions/auth.action";
+import { signup } from "../redux/actions/auth.action";
 
-// Define logo URL and sign logo URL
 const logoUrl = "https://gambolthemes.net/html-items/cursus-new-demo/images/logo.svg";
 const signBackgroundUrl = "https://gambolthemes.net/html-items/cursus-new-demo/images/sign.svg";
 const signLogoUrl = "https://gambolthemes.net/html-items/cursus-new-demo/images/sign_logo.png";
@@ -15,26 +14,28 @@ const SignupScreen = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
-  const handleLogin = async (values) => {
+  const handleSignup = async (values) => {
     setLoading(true);
-    await dispatch(login(values.username, values.password));
-    setLoading(false);
-    if (user) {
-      goToSignupStep(); // Navigate to SignupStep upon successful login
+    try {
+      await dispatch(signup(values.fullname, values.email, values.password));
+      setLoading(false);
+      navigate("/signupstep");
+    } catch (error) {
+      setLoading(false);
+      console.error("Signup error:", error);
     }
   };
 
-  const goToLogin = () => {
-    navigate("/login");
-  };
-
-  const goToSignupStep = () => {
-    navigate("/signupstep");
+  const validateEmail = (rule, value) => {
+    const regex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!value || regex.test(value)) {
+      return Promise.resolve();
+    }
+    return Promise.reject("Please enter a valid Gmail address!");
   };
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 relative">
-      {/* Background image */}
       <div className="absolute top-0 left-0 w-full h-full z-0">
         <img
           src={signBackgroundUrl}
@@ -43,7 +44,6 @@ const SignupScreen = () => {
         />
       </div>
 
-      {/* Content */}
       <div className="z-10 relative flex flex-col items-center py-8 max-w-md w-full">
         <img src={logoUrl} alt="Cursus Logo" className="w-32 h-8" />
 
@@ -55,12 +55,12 @@ const SignupScreen = () => {
             Sign Up and Start Learning!
           </p>
 
-          {/* Sign Up Form */}
-          <Form onFinish={handleLogin} className="w-full">
+          <Form onFinish={handleSignup} className="w-full">
             <Form.Item
               name="fullname"
               rules={[
                 { required: true, message: "Please input your full name!" },
+                { min: 6, message: "Full name must be at least 6 characters!" }
               ]}
             >
               <Input placeholder="Full Name" className="w-full" />
@@ -68,7 +68,10 @@ const SignupScreen = () => {
 
             <Form.Item
               name="email"
-              rules={[{ required: true, message: "Please input your email!" }]}
+              rules={[
+                { required: true, message: "Please input your email!" },
+                { validator: validateEmail }
+              ]}
             >
               <Input placeholder="Email Address" className="w-full" />
             </Form.Item>
@@ -77,6 +80,7 @@ const SignupScreen = () => {
               name="password"
               rules={[
                 { required: true, message: "Please input your password!" },
+                { min: 6, message: "Password must be at least 6 characters!" }
               ]}
             >
               <Input.Password placeholder="Password" className="w-full" />
@@ -118,14 +122,13 @@ const SignupScreen = () => {
 
           <p className="text-center my-4 text-xs">
             Already have an account?{" "}
-            <span className="text-blue-600 cursor-pointer" onClick={goToLogin}>
+            <span className="text-blue-600 cursor-pointer" onClick={() => navigate("/login")}>
               Log In
             </span>
           </p>
         </div>
       </div>
 
-      {/* Footer */}
       <div className="mt-4 text-center mb-auto z-10">
         <img
           src={signLogoUrl}

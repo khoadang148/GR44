@@ -1,8 +1,7 @@
-// src/LoginScreen.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom"; // Import Link từ react-router-dom
-import { Form, Input, Button, Checkbox } from "antd"; // Import Checkbox từ Ant Design
+import { useNavigate, Link } from "react-router-dom";
+import { Form, Input, Button, Checkbox } from "antd";
 import { login } from "../redux/actions/auth.action";
 import Cookies from "js-cookie";
 import {
@@ -22,25 +21,40 @@ const signLogoUrl =
 
 const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [form] = Form.useForm(); // Khởi tạo biến form
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const error = useSelector((state) => state.auth.error);
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
-  console.log("user", user);
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("email");
+    const savedPassword = localStorage.getItem("password");
+    if (savedEmail && savedPassword) {
+      form.setFieldsValue({
+        email: savedEmail,
+        password: savedPassword,
+      });
+      setRememberMe(true);
+    }
+  }, [form]);
 
   const handleLogin = async (values) => {
     setLoading(true);
-    console.log(values);
-    await dispatch(login(values.username, values.password));
+    await dispatch(login(values.email, values.password));
     setLoading(false);
 
-    // if (token) {
-    //   Cookies.set("token", token, { expires: 7 });
-    //   navigate("/home");
-    // }
     if (Cookies.get("token")) {
       Cookies.set("token", token, { expires: 7 });
+      if (rememberMe) {
+        localStorage.setItem("email", values.email);
+        localStorage.setItem("password", values.password);
+      } else {
+        localStorage.removeItem("email");
+        localStorage.removeItem("password");
+      }
       navigate("/home");
     }
   };
@@ -48,6 +62,7 @@ const LoginScreen = () => {
   const handleSocialLogin = async (provider) => {
     console.log(`Logging in with ${provider}`);
   };
+
   const goToSignUp = () => {
     navigate("/signup");
   };
@@ -104,19 +119,27 @@ const LoginScreen = () => {
 
           {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
 
-          <Form onFinish={handleLogin} className="w-full">
+          <Form form={form} onFinish={handleLogin} className="w-full">
             <Form.Item
-              name="username"
+              name="email"
               rules={[
                 {
+                  type: 'email',
+                  message: 'The input is not valid E-mail!',
+                },
+                {
                   required: true,
-                  message: "Please input your email or phone number!",
+                  message: 'Please input your E-mail!',
+                },
+                {
+                  pattern: /^[\w-\.]+@gmail\.com$/,
+                  message: 'Please enter a valid Gmail address!',
                 },
               ]}
             >
               <Input
                 prefix={<FaEnvelope className="mr-2 text-gray-500" />}
-                placeholder="Email Address"
+                placeholder="Gmail Address"
               />
             </Form.Item>
             <Form.Item
@@ -131,7 +154,12 @@ const LoginScreen = () => {
               />
             </Form.Item>
             <Form.Item>
-              <Checkbox>Remember Me</Checkbox>
+              <Checkbox
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              >
+                Remember Me
+              </Checkbox>
             </Form.Item>
 
             <Form.Item>
@@ -156,7 +184,6 @@ const LoginScreen = () => {
             <Link to="/forgot-password" className="text-red-500">
               Forgot Password
             </Link>{" "}
-            {/* Sử dụng Link thay cho thẻ a */}
           </p>
 
           {/* Sign Up Link */}

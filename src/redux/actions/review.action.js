@@ -43,14 +43,23 @@ export const getAllReviews = (userId) => {
     };
   };
 
-  export const searchReview = (query) => {
+
+  export const searchReview = (userId, query) => {
     return async (dispatch) => {
       dispatch({ type: SEARCH_REVIEWS_REQUEST });
   
       try {
-        const reviewsResponse = await axios.get(`${API_URL}/reviews`);
-        const filteredReviews = reviewsResponse.data.filter((review) =>
-          review.username.toLowerCase().includes(query.toLowerCase())
+        const userResponse = await axios.get(`${API_URL_USER}/users/${userId}`);
+        const reviewsIds = userResponse.data.review.map(
+          (review) => review.number
+        );
+        const reviewsResponse = await axios.get(`${API_URL}/reviews`, {
+          params: { number: reviewsIds.join("") },
+        });
+        const filteredReviews = reviewsResponse.data.filter(
+          (review) =>
+            userResponse.data.review.includes(review.number) &&
+            review.username.toLowerCase().includes(query.toLowerCase())
         );
   
         dispatch({

@@ -1,53 +1,27 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { useDispatch } from "react-redux";
-import { addMessage } from "./redux/actions/chat.action";
+// WebSocketProvider.js
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 const WebSocketContext = createContext(null);
 
 export const WebSocketProvider = ({ children }) => {
-  const [isConnected, setIsConnected] = useState(false);
-  const websocketRef = useRef(null);
-  const dispatch = useDispatch();
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    websocketRef.current = new WebSocket("ws://localhost:8080");
-
-    websocketRef.current.onopen = () => {
-      console.log("Connected to WebSocket server");
-      setIsConnected(true);
-    };
-
-    websocketRef.current.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      dispatch(addMessage(message));
-    };
-
-    websocketRef.current.onclose = () => {
-      console.log("Disconnected from WebSocket server");
-      setIsConnected(false);
-    };
+    const newSocket = io("https://signaling-server-r4dq.onrender.com/"); // Thay thế bằng URL backend trên Render
+    setSocket(newSocket);
 
     return () => {
-      websocketRef.current.close();
+      newSocket.close();
     };
-  }, [dispatch]);
+  }, []);
 
   const sendMessage = (message) => {
-    if (isConnected) {
-      websocketRef.current.send(JSON.stringify(message));
-    } else {
-      console.error("WebSocket is not connected");
-    }
+    socket.emit("sendMessage", message);
   };
 
   return (
-    <WebSocketContext.Provider value={{ sendMessage }}>
+    <WebSocketContext.Provider value={{ socket, sendMessage }}>
       {children}
     </WebSocketContext.Provider>
   );

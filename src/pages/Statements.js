@@ -36,7 +36,10 @@ const Statements = ({ sidebar }) => {
         ? statement.orderId.includes(searchTerm)
         : true;
 
-      return matchesMonth && matchesSearch;
+      // Check if statement role is "student"
+      const matchesRole = statement.role === "student";
+
+      return matchesMonth && matchesSearch && matchesRole;
     });
 
     setFilteredStatements(filtered);
@@ -44,7 +47,7 @@ const Statements = ({ sidebar }) => {
 
   const handleSearch = () => {
     if (!searchDocNumber.trim()) {
-      setFilteredStatements(statements);
+      setFilteredStatements(statements.filter(statement => statement.role === "student"));
       return;
     }
 
@@ -56,7 +59,8 @@ const Statements = ({ sidebar }) => {
       return (
         statementDate.getDate() === searchDate.getDate() &&
         statementDate.getMonth() === searchDate.getMonth() &&
-        statementDate.getFullYear() === searchDate.getFullYear()
+        statementDate.getFullYear() === searchDate.getFullYear() &&
+        statement.role === "student"
       );
     });
 
@@ -97,29 +101,28 @@ const Statements = ({ sidebar }) => {
           </div>
 
           <div className="md:w-1/3 rounded-sm bg-white text-black font-medium p-2">
-        <div>
-          <h2 className="text-xl font-semibold mb-4">View Invoices</h2>
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="flex-grow">
-              <select className="w-full px-3 py-2 border rounded">
-                <option>Select Invoices</option>
-                <option>May 2024</option>
-                <option>June 2024</option>
-                <option>July 2024</option>
-              </select>
+            <div>
+              <h2 className="text-xl font-semibold mb-4">View Invoices</h2>
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="flex-grow">
+                  <select className="w-full px-3 py-2 border rounded">
+                    <option>Select Invoices</option>
+                    <option>May 2024</option>
+                    <option>June 2024</option>
+                    <option>July 2024</option>
+                  </select>
+                </div>
+                <button className="bg-red-600 text-white rounded px-3 py-2 flex justify-center items-center">
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v1a1 1 0 11-2 0V5H5v10h4a1 1 0 110 2H4a1 1 0 01-1-1V4z" clipRule="evenodd" />
+                    <path d="M9 11a1 1 0 000 2h3a1 1 0 100-2H9z" />
+                  </svg>
+                </button>
+              </div>
             </div>
-            <button className="bg-red-600 text-white rounded px-3 py-2 flex justify-center items-center">
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v1a1 1 0 11-2 0V5H5v10h4a1 1 0 110 2H4a1 1 0 01-1-1V4z" clipRule="evenodd" />
-                <path d="M9 11a1 1 0 000 2h3a1 1 0 100-2H9z" />
-              </svg>
-            </button>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-
 
       <div className="flex items-center py-3 px-4">
         <button
