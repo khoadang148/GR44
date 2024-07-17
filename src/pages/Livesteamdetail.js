@@ -22,7 +22,7 @@ const LivestreamDetail = ({ sidebar }) => {
   const { messages } = useSelector((state) => state.chat);
   const [inputMessage, setInputMessage] = useState("");
   const [username, setUsername] = useState("");
-  const { sendMessage } = useWebSocket();
+  const { sendMessage, socket } = useWebSocket();
   const webcamRef = useRef(null);
 
   useEffect(() => {
@@ -33,17 +33,29 @@ const LivestreamDetail = ({ sidebar }) => {
     const name = Cookies.get("username");
     setUsername(name);
 
-    const savedMessages =
-      JSON.parse(localStorage.getItem(`chatMessages_${id}`)) || [];
-    dispatch(setMessages(savedMessages));
-  }, [dispatch, id]);
+    socket.on("loadMessages", (loadedMessages) => {
+      dispatch(setMessages(loadedMessages));
+    });
+
+    socket.emit("startLivestream", id);
+
+    return () => {
+      socket.off("loadMessages");
+    };
+  }, [dispatch, id, socket]);
 
   useEffect(() => {
-    // When component mounts, start the livestream if it's the instructor's own livestream
     if (id === instructor?.id) {
-      sendMessage("startLivestream", id); // Send message to start livestream on server
+      sendMessage({ type: "startLivestream", userId: id });
     }
-  }, [id, instructor, sendMessage]);
+    socket.on("receiveMessage", (message) => {
+      dispatch(addMessage(message));
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
+  }, [id, instructor, sendMessage, socket, dispatch]);
 
   const handleSendMessage = () => {
     if (inputMessage.trim() !== "") {
@@ -52,15 +64,9 @@ const LivestreamDetail = ({ sidebar }) => {
         content: inputMessage,
         instructorId: id,
       };
-      sendMessage("sendMessage", message); // Send message to server
-      dispatch(addMessage(message));
+      sendMessage(message);
+      // dispatch(addMessage(message));
       setInputMessage("");
-
-      const updatedMessages = [...messages, message];
-      localStorage.setItem(
-        `chatMessages_${id}`,
-        JSON.stringify(updatedMessages)
-      );
     }
   };
 

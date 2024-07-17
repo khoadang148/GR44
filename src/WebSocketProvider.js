@@ -8,7 +8,7 @@ export const WebSocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io("https://signaling-server-r4dq.onrender.com/"); // Thay thế bằng URL backend trên Render
+    const newSocket = io("https://signaling-server-r4dq.onrender.com/");
     setSocket(newSocket);
 
     return () => {
