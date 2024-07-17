@@ -93,9 +93,8 @@ export const getEnrolledCourses = (userId) => {
       const userResponse = await axios.get(`${API_URL}/users/${userId}`);
       const enrolledCoursesIds = userResponse.data.enrolledCourses.map(
         (course) => course.id
-
       );
-      console.log(enrolledCoursesIds)
+      console.log(enrolledCoursesIds);
       const coursesResponse = await axios.get(`${API_URL}/courses`, {
         params: { id: enrolledCoursesIds.join(",") },
       });
@@ -116,63 +115,24 @@ export const getEnrolledCourses = (userId) => {
   };
 };
 
-// export const getSavedCourses = (userId) => {
-//   return async (dispatch) => {
-//     dispatch({ type: FETCH_SAVED_COURSES_REQUEST });
-
-//     try {
-//       // Lấy thông tin người dùng để lấy savedCourses
-//       const userResponse = await axios.get(`${API_URL}/users/${userId}`);
-//       const savedCoursesIds = userResponse.courseData;
-
-//       // Lấy dữ liệu khóa học cho các khóa học đã lưu
-//       const apiUrl = `${API_URL}/courses`;
-//       const coursesResponse = await axios.get(apiUrl, {
-//         params: { id: savedCoursesIds.join("") },
-//       });
-      
-
-//       const filteredCourses = coursesResponse.data.filter((course) =>
-//         savedCoursesIds.includes(course.id)
-//       );
-
-      
-//       dispatch({
-//         type: FETCH_SAVED_COURSES_SUCCESS,
-//         payload: filteredCourses,
-//       });
-//     } catch (error) {
-//       dispatch({
-//         type: FETCH_SAVED_COURSES_FAILURE,
-//         error: error.message,
-//       });
-//     }
-//   };
-// };
 export const getSavedCourses = (userId) => {
   return async (dispatch) => {
     dispatch({ type: FETCH_SAVED_COURSES_REQUEST });
-
     try {
-      // Step 1: Lấy thông tin người dùng để lấy danh sách khóa học đã lưu
       const userResponse = await axios.get(`${API_URL}/users/${userId}`);
-      const savedCoursesIds = userResponse.data.savedCourses
- console.log(userId)
- console.log(savedCoursesIds)
-      // Step 2: Gọi API để lấy danh sách khóa học dựa trên các ID đã lưu
-      const coursesResponse = await axios.get(`${API_URL}/courses`)
-      // Step 3: Lọc và xử lý danh sách các khóa học đã lưu từ phản hồi API
-      const filteredCourses = coursesResponse.data.filter(course =>
+      const savedCoursesIds = userResponse.data.savedCourses;
+
+      const coursesResponse = await axios.get(`${API_URL}/courses`);
+
+      const filteredCourses = coursesResponse.data.filter((course) =>
         savedCoursesIds.includes(course.id)
       );
 
-      // Gửi action thành công và cập nhật payload
       dispatch({
         type: FETCH_SAVED_COURSES_SUCCESS,
         payload: filteredCourses,
       });
     } catch (error) {
-      // Xử lý lỗi nếu có
       dispatch({
         type: FETCH_SAVED_COURSES_FAILURE,
         error: error.message,
@@ -225,16 +185,11 @@ export const deleteSavedCourses = (userId, courseId) => {
   return async (dispatch) => {
     dispatch({ type: DELETE_SAVED_COURSES_REQUEST });
     try {
-      // Lấy thông tin người dùng để lấy savedCourses
       const userResponse = await axios.get(`${API_URL}/users/${userId}`);
       const savedCourses = userResponse.data.savedCourses;
-
-      // Lọc ra khóa học cần xóa
       const updatedSavedCourses = savedCourses.filter(
         (course) => course !== courseId
       );
-
-      // Cập nhật savedCourses của người dùng
       await axios.put(`${API_URL}/users/${userId}`, {
         ...userResponse.data,
         savedCourses: [],
@@ -244,8 +199,6 @@ export const deleteSavedCourses = (userId, courseId) => {
         type: DELETE_SAVED_COURSES_SUCCESS,
         payload: [],
       });
-
-      // Lấy lại thông tin người dùng đã cập nhật
       const updatedUserResponse = await axios.get(`${API_URL}/users/${userId}`);
       const savedCoursesIds = updatedUserResponse.data.savedCourses.map(
         (course) => course.id
