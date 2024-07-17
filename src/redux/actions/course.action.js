@@ -11,9 +11,12 @@ import {
   CREATE_COURSE_REQUEST,
   CREATE_COURSE_SUCCESS,
   CREATE_COURSE_FAILURE,
-  DELETE_SAVEDCOURSES_REQUEST,
-  DELETE_SAVEDCOURSES_SUCCESS,
-  DELETE_SAVEDCOURSES_FAILURE,
+  DELETE_SAVED_COURSES_REQUEST,
+  DELETE_SAVED_COURSES_SUCCESS,
+  DELETE_SAVED_COURSES_FAILURE,
+  FETCH_SAVED_COURSES_SUCCESS,
+  FETCH_SAVED_COURSES_REQUEST,
+  FETCH_SAVED_COURSES_FAILURE,
 } from "../actionType";
 import { differenceInDays, parse, isValid } from "date-fns";
 
@@ -111,6 +114,35 @@ export const getEnrolledCourses = (userId) => {
   };
 };
 
+export const getSavedCourses = (userId) => {
+  return async (dispatch) => {
+    dispatch({ type: FETCH_SAVED_COURSES_REQUEST });
+
+    try {
+      const userResponse = await axios.get(`${API_URL}/users/${userId}`);
+      const savedCoursesIds = userResponse.data.savedCourses.map(
+        (course) => course.id
+      );
+
+      const apiUrl = `${API_URL}/courses`;
+      const coursesResponse = await axios.get(apiUrl);
+      const coursesData = coursesResponse.data;
+      console.log("Courses Response: ", coursesResponse);
+
+      dispatch({
+        type: FETCH_SAVED_COURSES_SUCCESS,
+        payload: coursesData,
+      });
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách khóa học:", error);
+      dispatch({
+        type: FETCH_SAVED_COURSES_FAILURE,
+        error: error.message,
+      });
+    }
+  };
+};
+
 export const searchCourses = (query) => {
   return async (dispatch) => {
     dispatch({ type: SEARCH_COURSES_REQUEST });
@@ -150,44 +182,53 @@ export const createCourse = (courseData) => async (dispatch) => {
     dispatch({ type: CREATE_COURSE_FAILURE, payload: error.message });
   }
 };
+
 export const deleteSavedCourses = (userId, courseId) => {
   return async (dispatch) => {
-    dispatch({ type: DELETE_SAVEDCOURSES_REQUEST });
-
+    dispatch({ type: DELETE_SAVED_COURSES_REQUEST });
     try {
+      // Lấy thông tin người dùng để lấy savedCourses
       const userResponse = await axios.get(`${API_URL}/users/${userId}`);
       const savedCourses = userResponse.data.savedCourses;
 
+      // Lọc ra khóa học cần xóa
       const updatedCourses = savedCourses.filter(
-        (course) => course.id !== courseId
+        (course) => course !== courseId
       );
 
       await axios.put(`${API_URL}/users/${userId}`, {
+        ...userResponse.data,
         savedCourses: updatedCourses,
       });
 
       dispatch({
-        type: DELETE_SAVEDCOURSES_SUCCESS,
+        type: DELETE_SAVED_COURSES_SUCCESS,
         payload: updatedCourses,
       });
 
-      dispatch({ type: FETCH_ENROLLED_COURSES_REQUEST });
+      const updatedUserResponse = await axios.get(`${API_URL}/users/${userId}`);
+
+      const savedCoursesIds = updatedUserResponse.data.savedCourses.map(
+        (course) => course.id
+      );
 
       const coursesResponse = await axios.get(`${API_URL}/courses`, {
-        params: { id: updatedCourses.map((course) => course.id).join(",") },
+        params: { id: savedCoursesIds.join(",") },
       });
 
+      const filteredCourses = coursesResponse.data.filter((course) =>
+        updatedUserResponse.data.savedCourses.includes(course.id)
+      );
+
       dispatch({
-        type: FETCH_ENROLLED_COURSES_SUCCESS,
-        payload: coursesResponse.data,
+        type: FETCH_SAVED_COURSES_SUCCESS,
+        payload: filteredCourses,
       });
     } catch (error) {
       dispatch({
-        type: DELETE_SAVEDCOURSES_FAILURE,
+        type: DELETE_SAVED_COURSES_FAILURE,
         error: error.message,
       });
     }
   };
 };
-
-
