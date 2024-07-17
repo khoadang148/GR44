@@ -181,7 +181,7 @@ export const createCourse = (courseData) => async (dispatch) => {
   }
 };
 
-export const deleteAllSavedCourses = (userId) => {
+export const deleteSavedCourses = (userId) => {
   return async (dispatch) => {
     dispatch({ type: DELETE_SAVED_COURSES_REQUEST });
     try {
