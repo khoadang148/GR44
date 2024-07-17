@@ -90,6 +90,22 @@ const SavedCourses = ({ sidebar }) => {
     }
   }, [dispatch, userId]);
 
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+  const handleDeleteCourse = () => {
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleConfirmDelete = () => {
+    dispatch(deleteSavedCourses(userId)); 
+    setShowDeleteConfirmation(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirmation(false);
+  };
+
+
   const handleMouseEnter = (index) => {
     setHoveredCourse(index);
   };
@@ -109,16 +125,34 @@ const SavedCourses = ({ sidebar }) => {
         <div className="flex justify-between items-center">
           <h2 className="text-base font-medium">Saved Courses</h2>
           <button className="text-sm text-gray-700 font-normal" >
-            Remove All
+            Remove All 
           </button>
         </div>
         <hr className="my-2" />
         <p className="text-gray-500 text-sm">{savedCourses.length} Courses</p>
-        <button className="bg-[#ED2927] hover:bg-[#333333] text-white w-full py-2 rounded-sm mt-4" onClick={handleRemoveAll}>
+        <button className="bg-[#ED2927] hover:bg-[#333333] text-white w-full py-2 rounded-sm mt-4" onClick={handleDeleteCourse}>
           <FontAwesomeIcon icon={faTrashAlt} className="mr-2" />
-          <span className="text-sm">Remove Saved Courses</span>
-          
+          <span className="text-sm" >Remove Saved Courses</span>
         </button>
+        {showDeleteConfirmation && (
+          <div className="mt-4">
+            <p>Are you sure you want to remove all saved courses?</p>
+            <div className="flex mt-2">
+              <button
+                className="bg-[#ED2927] hover:bg-[#333333] text-white px-4 py-2 rounded-sm mr-2"
+                onClick={handleConfirmDelete}
+              >
+                Yes, Remove All
+              </button>
+              <button
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-sm"
+                onClick={handleCancelDelete}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
       <div
         className={`col-span-1 md:col-span-2 space-y-6 ${
@@ -126,9 +160,9 @@ const SavedCourses = ({ sidebar }) => {
         }`}
       >
         <h1 className="text-xl font-medium">Saved Courses</h1>
-        {savedCourses.map((course) => (
+        {savedCourses.map((course, index) => (
           <CourseCard
-            key={course.id} // Use a unique identifier from your course data
+            key={course.id}
             thumbnail={course.thumbnail}
             rate={course.rate}
             title={course.title}
@@ -138,7 +172,7 @@ const SavedCourses = ({ sidebar }) => {
             price={course.price}
             views={course.views}
             date={course.date}
-            index={course.id} // Or another unique identifier
+            index={index}
             hoveredCourse={hoveredCourse}
             handleMouseEnter={handleMouseEnter}
             handleMouseLeave={handleMouseLeave}
