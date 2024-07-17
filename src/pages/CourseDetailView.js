@@ -16,10 +16,10 @@ import { faCircleCheck, faShareNodes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Menu, Radio, Space } from "antd";
 import React, { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Alert, Button, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAllReviews } from "../redux/actions/review.action";
+import { getAllReviews, searchReview } from "../redux/actions/review.action";
 
 const getLevelKeys = (items1) => {
   const key = {};
@@ -1671,18 +1671,32 @@ const CourseDetailView = ({ sidebar }) => {
   const Reviews = ({ sidebar }) => {
     const { reviews, loading, error } = useSelector((state) => state.review);
     const dispatch = useDispatch();
+    const [searchQuery, setSearchQuery] = useState('');
+    const reviewsToShow = 3;
+    const userId = useSelector((state) => state.auth.id);
 
     useEffect(() => {
-        dispatch(getAllReviews());
-    }, [dispatch]);
+      if (userId){
+      dispatch(getAllReviews(userId));
+      }
+    }, [dispatch, userId]);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        if (searchQuery) {
+          console.log(searchQuery);
+          dispatch(searchReview(userId, searchQuery));
+        } else {
+          dispatch(getAllReviews(userId));
+        }
+      }, 300);
+  
+      return () => clearTimeout(timer);
+    }, [searchQuery, dispatch, userId]);
+  
+    const handleInputChange = (event) => {
+      setSearchQuery(event.target.value);
+    };
 
     return (
         <div>
@@ -1777,6 +1791,8 @@ const CourseDetailView = ({ sidebar }) => {
                                     type='text'
                                     placeholder='Search reviews..'
                                     className='focus:outline-none w-full text-xs p-2 bg-white text-black'
+                                    value={searchQuery}
+                                    onChange={handleInputChange}
                                 />
                                 <button className='bg-red-500 p-1.5 hover:bg-[#333333] transition duration-300'>
                                     <SearchOutlined style={{ color: 'white', fontSize: '16px' }} />
@@ -1784,37 +1800,55 @@ const CourseDetailView = ({ sidebar }) => {
                             </div>
                         </div>
                     </div>
-                    {/* Mapping over reviews array to display reviews */}
-                    {reviews.map((review, index) => (
-                        <div key={index} className='bg-white w-full h-auto mt-8 pb-4 pt-2'>
-                           
-                            <div>
-                                <div className='flex gap-3 mt-6 ml-4'>
-                                    <div>
-                                        <img
-                                            src={review.img}
-                                            width={40}
-                                            alt='img'
-                                        />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <h3>{review.name}</h3>
-                                        <div className="text-sm font-medium text-gray-500">{review.time}</div>
-                                    </div>
-                                </div>
-                                <div className='ml-4 mt-4 text-yellow-500 text-[20px] flex gap-1'>
-                                    <FontAwesomeIcon icon={faStar} />
-                                    <FontAwesomeIcon icon={faStar} />
-                                    <FontAwesomeIcon icon={faStar} />
-                                    <FontAwesomeIcon icon={faStar} />
-                                    <FontAwesomeIcon className='text-[#F7F7F7]' icon={faStar} />
-                                </div>
-                                <div className='ml-4 mt-4 leading-7'>
-                                    <p className='text-gray-400 text-[14px]'>{review.content}</p>
-                                </div>
-                            </div>
+                    <div className="col-span-2 space-y-6 ">
+              {loading ? (
+                <div className="col-span-4 flex justify-center">
+                  <Spinner animation="border" />
+                </div>
+              ) : error ? (
+                <div className="col-span-4">
+                  <Alert variant="danger">No reviews found</Alert>
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="col-span-4">
+                  <Alert variant="info">No reviews found</Alert>
+                </div>
+              ) : (
+                reviews.slice(0, reviewsToShow).map((review, index) => (
+                  <div key={index} className='bg-white w-full h-auto mt-8 pb-4'>
+                    <div className='pt-4'>
+                      <h1 className='text-xl ml-4'>Course Title Here</h1>
+                      <hr className="my-2 w-full border-gray-300" />
+                    </div>
+                    <div>
+                      <div className='flex gap-3 mt-6 ml-4'>
+                        <div>
+                          <img
+                            src={review.avatar}
+                            width={40}
+                            alt='img'
+                          />
                         </div>
-                    ))}
+                        <div className="flex flex-col">
+                          <h3>{review.username}</h3>
+                          <div className="text-sm font-light text-gray-500">{review.time}</div>
+                        </div>
+                      </div>
+                      <div className='ml-4 mt-4 text-yellow-500 text-[20px] flex gap-1'>
+                        <FontAwesomeIcon icon={faStar} />
+                        <FontAwesomeIcon icon={faStar} />
+                        <FontAwesomeIcon icon={faStar} />
+                        <FontAwesomeIcon icon={faStar} />
+                        <FontAwesomeIcon className='text-[#F7F7F7]' icon={faStar} />
+                      </div>
+                      <div className='ml-4 mt-4 leading-7'>
+                        <p className='text-gray-400 text-[14px]'>{review.title}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
                 </div>
             </div>
         </div>
