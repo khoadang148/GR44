@@ -181,15 +181,11 @@ export const createCourse = (courseData) => async (dispatch) => {
   }
 };
 
-export const deleteSavedCourses = (userId, courseId) => {
+export const deleteAllSavedCourses = (userId) => {
   return async (dispatch) => {
     dispatch({ type: DELETE_SAVED_COURSES_REQUEST });
     try {
       const userResponse = await axios.get(`${API_URL}/users/${userId}`);
-      const savedCourses = userResponse.data.savedCourses;
-      const updatedSavedCourses = savedCourses.filter(
-        (course) => course !== courseId
-      );
       await axios.put(`${API_URL}/users/${userId}`, {
         ...userResponse.data,
         savedCourses: [],
@@ -199,22 +195,10 @@ export const deleteSavedCourses = (userId, courseId) => {
         type: DELETE_SAVED_COURSES_SUCCESS,
         payload: [],
       });
-      const updatedUserResponse = await axios.get(`${API_URL}/users/${userId}`);
-      const savedCoursesIds = updatedUserResponse.data.savedCourses.map(
-        (course) => course.id
-      );
-
-      const coursesResponse = await axios.get(`${API_URL}/courses`, {
-        params: { id: savedCoursesIds.join(",") },
-      });
-
-      const filteredCourses = coursesResponse.data.filter((course) =>
-        updatedUserResponse.data.savedCourses.includes(course.id)
-      );
 
       dispatch({
         type: FETCH_SAVED_COURSES_SUCCESS,
-        payload: filteredCourses,
+        payload: [],
       });
     } catch (error) {
       dispatch({
