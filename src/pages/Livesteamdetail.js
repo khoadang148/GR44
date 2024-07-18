@@ -33,14 +33,18 @@ const LivestreamDetail = ({ sidebar }) => {
     const name = Cookies.get("username");
     setUsername(name);
 
-    socket.on("loadMessages", (loadedMessages) => {
-      dispatch(setMessages(loadedMessages));
-    });
+    if (socket) {
+      socket.on("loadMessages", (loadedMessages) => {
+        dispatch(setMessages(loadedMessages));
+      });
 
-    socket.emit("startLivestream", id);
+      socket.emit("startLivestream", id);
+    }
 
     return () => {
-      socket.off("loadMessages");
+      if (socket) {
+        socket.off("loadMessages");
+      }
     };
   }, [dispatch, id, socket]);
 
@@ -48,12 +52,17 @@ const LivestreamDetail = ({ sidebar }) => {
     if (id === instructor?.id) {
       sendMessage({ type: "startLivestream", userId: id });
     }
-    socket.on("receiveMessage", (message) => {
-      dispatch(addMessage(message));
-    });
+
+    if (socket) {
+      socket.on("receiveMessage", (message) => {
+        dispatch(addMessage(message));
+      });
+    }
 
     return () => {
-      socket.off("receiveMessage");
+      if (socket) {
+        socket.off("receiveMessage");
+      }
     };
   }, [id, instructor, sendMessage, socket, dispatch]);
 
@@ -65,7 +74,6 @@ const LivestreamDetail = ({ sidebar }) => {
         instructorId: id,
       };
       sendMessage(message);
-      // dispatch(addMessage(message));
       setInputMessage("");
     }
   };
