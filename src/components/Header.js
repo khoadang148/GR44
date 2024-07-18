@@ -16,7 +16,8 @@ const Header = ({ handleToggleSidebar }) => {
     document.documentElement.classList.toggle('dark');
   }
   const avatar = Cookies.get('avatar');
-  
+  const username = Cookies.get('username');
+  const email = Cookies.get('email');
   const handleShoppingCart = () => {
     navigate("/shoppingcart");
   };
@@ -226,11 +227,11 @@ const handleLogout = () => {
         </div>
         <div className="flex flex-col">
           <div className="flex items-center gap-3">
-            <h3 className="text-black dark:text-gray-200">Zoena Singh</h3>
+            <h3 className="text-black dark:text-gray-200">{username}</h3>
             <CheckCircleOutlined className="text-blue-500 mt-[-5px]" />
           </div>
           <div className="break-words w-64 text-gray-800 dark:text-gray-400">
-            lukakumap@gmail.com
+            {email}
           </div>
           <h3 className="hover:text-[#ED2A26] text-black dark:text-gray-200">View Instructor Profile</h3>
         </div>

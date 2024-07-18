@@ -20,7 +20,7 @@ export const updateUserFailure = (error) => ({
 });
 
 
-export const updateUser = (userId, firstName, lastName,headline,description,mysite,facebookbprofile,twitterprofile,linkedinprofile,youtubeprofile) => {
+export const updateUser = (userId, firstName, lastName,headline,description,mysite,facebookbprofile,twitterprofile,linkedinprofile,youtubeprofile,academyname, country, addressline1, addressline2, city, province, zip,phonenumber,youraddress,swiftcode,backaccountnumber,fullname,backname,backaddress) => {
   return async (dispatch) => {
     dispatch(updateUserRequest());
     try {
@@ -34,6 +34,21 @@ export const updateUser = (userId, firstName, lastName,headline,description,mysi
         twitterprofile: twitterprofile,
         linkedinprofile: linkedinprofile,
         youtubeprofile: youtubeprofile,
+        academyname: academyname,
+        country: country,
+        addressline1: addressline1,
+        addressline2: addressline2,
+        city: city,
+        province:province,
+        zip: zip,
+        phonenumber: phonenumber,
+        youraddress: youraddress,
+        swiftcode: swiftcode,
+        backaccountnumber: backaccountnumber,
+        fullname: fullname,
+        backname: backname,
+        backaddress:backaddress,
+
       });
       dispatch(updateUserSuccess(response.data));
     } catch (error) {

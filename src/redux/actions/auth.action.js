@@ -46,6 +46,7 @@ export const login = (email, password) => {
         Cookies.set("username", user.username, { expires: 365 });
         localStorage.setItem('firstName', user.firstName || '');
         localStorage.setItem('lastName', user.lastName || '');
+        Cookies.set("email", user.email, { expires: 7 });
         }
       } else {
         dispatch({ type: LOGIN_FAILURE, error: "Invalid email or password" });
@@ -65,6 +66,7 @@ export const logout = () => {
   Cookies.remove("role");
   Cookies.remove("avatar");
   Cookies.remove("username");
+  Cookies.remove("email");
   localStorage.removeItem('firstName');
   localStorage.removeItem('lastName');
   localStorage.removeItem('headline');

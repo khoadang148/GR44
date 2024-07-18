@@ -23,6 +23,7 @@ const initialState = {
   id: Cookies.get("id") || null,
   avatar: Cookies.get("avatar") || null,
   username: Cookies.get("username") || null,
+  email: Cookies.get("email") || null,
   forgotPassword: {
     defaultPassword: null,
     error: null,
@@ -42,6 +43,7 @@ const authReducer = (state = initialState, action) => {
         user: action.payload,
         avatar: Cookies.get("avatar"), // Save avatar to state
         username: Cookies.get("username"),
+        email:  Cookies.get("email"),
         error: null,
         loading: false,
       };
