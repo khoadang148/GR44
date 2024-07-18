@@ -15,50 +15,48 @@ import {
   SET_ROLE, SET_USER,
   FORGOT_PASSWORD_REQUEST,
   FORGOT_PASSWORD_SUCCESS,
-  FORGOT_PASSWORD_FAILURE
+  FORGOT_PASSWORD_FAILURE,
+  FETCH_USERS_REQUEST,
+  FETCH_USERS_SUCCESS,
+  FETCH_USERS_FAILURE,
+  UPDATE_USER_ROLE_REQUEST,
+  UPDATE_USER_ROLE_SUCCESS,
+  UPDATE_USER_ROLE_FAILURE
+
 } from "../actionType";
 
 const API_URL = "https://667e5671297972455f67ee82.mockapi.io/projectojt/api/v1/users";
 
-export const login = (email, password) => {
-  return async (dispatch) => {
-    dispatch({ type: LOGIN_REQUEST });
-    try {
-      const response = await axios.get(`${API_URL}`, {
-        params: { email, password },
-      });
-      console.log(response);
 
-      if (response.data && response.data.length > 0) {
-        const user = response.data.find(
-          (user) => user.email === email && user.password === password
-        );
+export const login = (email, password) => async (dispatch) => {
+  dispatch({ type: LOGIN_REQUEST });
+  try {
+    const response = await axios.get(`${API_URL}`, { params: { email, password } });
+    if (response.data && response.data.length > 0) {
+      const user = response.data.find((user) => user.email === email && user.password === password);
+      if (user) {
+        const token = `fake-jwt-token-${user.email}`;
+        dispatch({ type: LOGIN_SUCCESS, payload: user });
+        dispatch({ type: SET_TOKEN, payload: token });
 
-        if (user) {
-          const token = `fake-jwt-token-${user.email}`;
-          dispatch({ type: LOGIN_SUCCESS, payload: user });
-          dispatch({ type: SET_TOKEN, payload: token });
-
-          Cookies.set("token", token, { expires: 7 });
-          Cookies.set("role", user.role, { expires: 7 });
-          Cookies.set("id", user.id, { expires: 7 });
-        Cookies.set("avatar", user.avatar, { expires: 7 });
-        Cookies.set("username", user.username, { expires: 365 });
+        Cookies.set('token', token, { expires: 7 });
+        Cookies.set('role', user.role, { expires: 7 });
+        Cookies.set('id', user.id, { expires: 7 });
+        Cookies.set('avatar', user.avatar, { expires: 7 });
+        Cookies.set('username', user.username, { expires: 365 });
         localStorage.setItem('firstName', user.firstName || '');
         localStorage.setItem('lastName', user.lastName || '');
-        Cookies.set("email", user.email, { expires: 7 });
-        }
-      } else {
-        dispatch({ type: LOGIN_FAILURE, error: "Invalid email or password" });
       }
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        dispatch({ type: LOGIN_FAILURE, error: "Incorrect email or password" });
-      } else {
-        dispatch({ type: LOGIN_FAILURE, error: error.message });
-      }
+    } else {
+      dispatch({ type: LOGIN_FAILURE, error: 'Invalid email or password' });
     }
-  };
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      dispatch({ type: LOGIN_FAILURE, error: 'Incorrect email or password' });
+    } else {
+      dispatch({ type: LOGIN_FAILURE, error: error.message });
+    }
+  }
 };
 
 export const logout = () => {
@@ -102,34 +100,42 @@ export const setID = (id) => {
   };
 };
 
-export const signup = (fullname, email, password, role = 'student') => {
-  return async (dispatch) => {
-    dispatch({ type: SIGNUP_REQUEST });
-    try {
-      const response = await axios.post(`${API_URL}`, {
-        fullname,
-        email,
-        password,
-        role,
-      });
+// Action creators
+export const signupRequest = () => ({
+  type: SIGNUP_REQUEST,
+});
 
-      const user = response.data;
-      const token = `fake-jwt-token-${user.email}`;
-      dispatch({ type: SIGNUP_SUCCESS, payload: user });
-      dispatch({ type: SET_TOKEN, payload: token });
+export const signupSuccess = (user) => ({
+  type: SIGNUP_SUCCESS,
+  payload: user,
+});
 
-      Cookies.set("token", token, { expires: 7 });
-      Cookies.set("role", user.role, { expires: 7 });
-      Cookies.set("id", user.id, { expires: 7 });
-      Cookies.set("avatar", user.avatar, { expires: 7 });
+export const signupFailure = (error) => ({
+  type: SIGNUP_FAILURE,
+  payload: error,
+});
 
-      return user;
-    } catch (error) {
-      dispatch({ type: SIGNUP_FAILURE, error: error.message });
-      throw error;
-    }
-  };
+export const signup = (fullname, email, password, role = 'student') => async (dispatch) => {
+  dispatch({ type: SIGNUP_REQUEST });
+  try {
+    const response = await axios.post(API_URL, { fullname, email, password, role });
+    const user = response.data;
+    const token = `fake-jwt-token-${user.email}`;
+    dispatch({ type: SIGNUP_SUCCESS, payload: user });
+    dispatch({ type: SET_TOKEN, payload: token });
+
+    Cookies.set('token', token, { expires: 7 });
+    Cookies.set('role', user.role, { expires: 7 });
+    Cookies.set('id', user.id, { expires: 7 });
+    Cookies.set('avatar', user.avatar, { expires: 7 });
+
+    return user;
+  } catch (error) {
+    dispatch({ type: SIGNUP_FAILURE, error: error.message });
+    throw error;
+  }
 };
+
 export const register = (userData) => async (dispatch) => {
   dispatch({ type: LOGIN_REQUEST });
   try {
@@ -150,35 +156,71 @@ export const register = (userData) => async (dispatch) => {
     dispatch({ type: LOGIN_FAILURE, error: error.message });
   }
 };
-export const forgotPassword = (email) => {
+export const forgotPassword = (email) => async (dispatch) => {
+  dispatch({ type: FORGOT_PASSWORD_REQUEST });
+  try {
+    const { data: users } = await axios.get(`${API_URL}/?email=${email}`);
+    if (users.length === 0) {
+      throw new Error('Email not found');
+    }
+
+    const user = users[0];
+    const userId = user.id;
+    const defaultPassword = 'password';
+
+    await axios.put(`${API_URL}/${userId}`, { ...user, password: defaultPassword });
+
+    dispatch({
+      type: FORGOT_PASSWORD_SUCCESS,
+      payload: { defaultPassword },
+    });
+  } catch (error) {
+    dispatch({
+      type: FORGOT_PASSWORD_FAILURE,
+      payload: { error: error.message },
+    });
+  }
+};
+
+export const fetchUsersSuccess = (users) => ({
+  type: FETCH_USERS_SUCCESS,
+  payload: users,
+});
+
+export const updateUserRoleSuccess = (userId, role) => ({
+  type: UPDATE_USER_ROLE_SUCCESS,
+  payload: { userId, role },
+});
+
+export const fetchUsers = () => {
   return async (dispatch) => {
-    dispatch({ type: FORGOT_PASSWORD_REQUEST });
-
     try {
-      // Fetch user by email
-      const { data: users } = await axios.get(`${API_URL}/?email=${email}`);
-      if (users.length === 0) {
-        throw new Error('Email not found');
-      }
-      
-      const user = users[0];
-      const userId = user.id;
-      const defaultPassword = 'password'; // Your default password
-
-      // Update user password
-      await axios.put(`${API_URL}/${userId}`, { ...user, password: defaultPassword });
-
-      dispatch({
-        type: FORGOT_PASSWORD_SUCCESS,
-        payload: {
-          defaultPassword: defaultPassword,
-        },
-      });
+      const response = await fetch('https://667e5671297972455f67ee82.mockapi.io/projectojt/api/v1/users');
+      const data = await response.json();
+      dispatch(fetchUsersSuccess(data));
     } catch (error) {
-      dispatch({
-        type: FORGOT_PASSWORD_FAILURE,
-        payload: { error: error.message },
-      });
+      console.error('Failed to fetch users:', error);
+      // Handle error here, dispatch an error action or show an error message
     }
   };
 };
+
+export const updateUserRole = (userId, role) => {
+  return async (dispatch) => {
+    try {
+      await fetch(`https://667e5671297972455f67ee82.mockapi.io/projectojt/api/v1/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ role }),
+      });
+      dispatch(updateUserRoleSuccess(userId, role));
+      // Optionally, you can dispatch a success action or handle success in the component
+    } catch (error) {
+      console.error('Failed to update user role:', error);
+      // Handle error here, dispatch an error action or show an error message
+    }
+  };
+};
+

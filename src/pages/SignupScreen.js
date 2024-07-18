@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Form, Input, Button, Checkbox } from "antd";
 import { signup } from "../redux/actions/auth.action";
 
+
 const logoUrl = "https://gambolthemes.net/html-items/cursus-new-demo/images/logo.svg";
 const signBackgroundUrl = "https://gambolthemes.net/html-items/cursus-new-demo/images/sign.svg";
 const signLogoUrl = "https://gambolthemes.net/html-items/cursus-new-demo/images/sign_logo.png";
@@ -33,6 +34,7 @@ const SignupScreen = () => {
     }
     return Promise.reject("Please enter a valid Gmail address!");
   };
+  
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 relative">
