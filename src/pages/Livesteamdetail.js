@@ -72,6 +72,7 @@ const LivestreamDetail = ({ sidebar }) => {
         username,
         content: inputMessage,
         instructorId: id,
+        timestamp: new Date().toLocaleTimeString(),
       };
       sendMessage(message);
       setInputMessage("");
@@ -161,10 +162,13 @@ const LivestreamDetail = ({ sidebar }) => {
         </div>
         <div className="bg-white px-5 py-5 w-[1000px] ml-10">
           <p className="font-semibold">Live Chat</p>
-          <div className="h-96 overflow-y-scroll">
+          <div className="h-96 overflow-y-scroll relative">
             {messages.map((message, index) => (
               <div key={index} className="mb-4">
                 <strong>{message.username}:</strong> {message.content}
+                <span className="text-gray-400 text-[15px] absolute right-10">
+                  {message.timestamp}
+                </span>
               </div>
             ))}
           </div>
