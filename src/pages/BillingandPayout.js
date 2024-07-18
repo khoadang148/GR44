@@ -1,7 +1,10 @@
 import { SettingOutlined } from "@ant-design/icons";
 import { Select,message } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { updateUser } from "../redux/actions/user.action";
+import Cookies from "js-cookie"; 
 
 const BillingandPayout = () => {
   const navigate = useNavigate();
@@ -76,12 +79,72 @@ const BillingandPayout = () => {
     setIsCircleClicked(false);
     setIsCircleClickedd(false);
   };
+ 
+  const [firstName, setFirstName] = useState(localStorage.getItem('firstName') || '');
+  const [lastName, setLastName] = useState(localStorage.getItem('lastName') || '');
+  const [academyname,setAcademyname] = useState(localStorage.getItem('academyname') ||'');
+  const [country,setCountry] = useState(localStorage.getItem('country') ||'');
+  const [addressline1,setAddressline1] = useState(localStorage.getItem('addressline1') ||'');
+  const [addressline2,setAddressline2] = useState(localStorage.getItem('addressline2') ||'');
+  const [city,setCity] = useState(localStorage.getItem('city') ||'');
+  const [province,setProvince] = useState(localStorage.getItem('state/province/region') ||'');
+  const [zip,setZip] = useState(localStorage.getItem('zip/postalcode') ||'');
+  const [phonenumber,setPhonenumber] = useState(localStorage.getItem('phonenumber') ||'');
+  const [fullname,setFullname] = useState(localStorage.getItem('fullname') ||'');
+  const [youraddress,setYouraddress] = useState(localStorage.getItem('youraddress') ||'');
+  const [swiftcode,setSwiftcode] = useState(localStorage.getItem('swiftcode') ||'');
+  const [backaccountnumber,setBackaccountnumber] = useState(localStorage.getItem('backaccountnumber') ||'');
+  const [backname,setBackname] = useState(localStorage.getItem('backname') ||'');
+  const [backaddress,setBackaddress] = useState(localStorage.getItem('backaddress') ||'');
+
+
+  useEffect(() => {
+    localStorage.setItem('firstName', firstName);
+    localStorage.setItem('lastName', lastName);
+    localStorage.setItem('academyname', academyname);
+    localStorage.setItem('country', country);
+    localStorage.setItem('addressline1', addressline1);
+    localStorage.setItem('addressline2', addressline2);
+    localStorage.setItem('city', city);
+    localStorage.setItem('state/province/region', province);
+    localStorage.setItem('zip', zip);
+    localStorage.setItem('phonenumber', phonenumber);
+    localStorage.setItem('youraddress', youraddress);
+    localStorage.setItem('swiftcode', swiftcode);
+    localStorage.setItem('backaccountnumber', backaccountnumber);
+    localStorage.setItem('fullname', fullname);
+    localStorage.setItem('backname', backname);
+    localStorage.setItem('backaddress', backaddress);
+  }, [firstName, lastName, academyname, country, addressline1, addressline2, city, province, zip,phonenumber,youraddress,swiftcode,backaccountnumber,fullname,backname,backaddress]);
+
+  const dispatch = useDispatch();
+  const userUpdate = useSelector((state) => state.userUpdate);
+  const { loading, error, user } = userUpdate;
   const [messageApi, contextHolder] = message.useMessage();
+
   const success = () => {
     messageApi.open({
       type: 'success',
-      content: 'Save Changes Successfully',
+      content: 'Save Changes Success',
     });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const userId = Cookies.get('id');
+   console.log(academyname)
+
+    dispatch(updateUser(userId, firstName, lastName,academyname, country, addressline1, addressline2, city, province, zip,phonenumber,youraddress,swiftcode,backaccountnumber,fullname,backname,backaddress))
+      .then(() => {
+        success();
+      })
+      .catch((error) => {
+        messageApi.open({
+          type: 'error',
+          content: `Error: ${error.message}`,
+        });
+      });
   };
   return (
     <div className="mt-20 ml-5 bg-[#F7F7F7] ">
@@ -109,24 +172,27 @@ const BillingandPayout = () => {
         <button className="p-2 rounded-md  font-medium" onClick={handleCloseAccount}>Close Account</button>
       </div>
 
-      <h5 className="mt-12 text-xl">Close account</h5>
+      <h5 className="mt-12 text-xl">Billing and Payouts</h5>
       
       <span className=" font-light">
-        Want to charge for a course? Provide your payment info and opt in for
-        our promotional programs
+      Want to charge for a course? Provide your payment info and opt in for our promotional programs
       </span>
       {/* ///////////////////////////////// */}
-      <div className="mt-12">
+    <form onSubmit={handleSubmit}>
+    <div className="mt-12">
         <h5 className=" text-lg">Billing Address</h5>
         {/* ///////////////////////////////// */}
         <div className="flex gap-5 mt-10">
           <input
             placeholder="First Name"
-            className="p-3 w-[550px] border border-solid"
+            className="p-3 w-[550px] border border-solid" value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
           ></input>
           <input
             placeholder="Last Name"
             className="p-3 w-[500px] border border-solid"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
           ></input>
         </div>
         {/* ///////////////////////////////// */}
@@ -134,6 +200,8 @@ const BillingandPayout = () => {
           <input
             placeholder="Academy Name"
             className="p-3 w-[1070px] border border-solid "
+            value={academyname}
+            onChange={(e) => setAcademyname(e.target.value)}
           />
         </div>
         {/* ///////////////////////////////// */}
@@ -961,26 +1029,34 @@ const BillingandPayout = () => {
       <input
         placeholder="Address Line 1"
         className="mt-10 p-3 w-[1070px] border border-solid"
+        value={addressline1}
+        onChange={(e) => setAddressline1(e.target.value)}
       ></input>
       <input
         placeholder="Address Line 2"
-        className="mt-10 p-3 w-[1070px] border border-solid"
+        className="mt-10 p-3 w-[1070px] border border-solid"  value={addressline2}
+        onChange={(e) => setAddressline2(e.target.value)}
       ></input>
       <input
         placeholder="City"
-        className="mt-10 p-3 w-[1070px] border border-solid"
+        className="mt-10 p-3 w-[1070px] border border-solid" 
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
       ></input>
       <input
         placeholder="State/Province/Region"
-        className="mt-10 p-3 w-[1070px] border border-solid"
+        className="mt-10 p-3 w-[1070px] border border-solid"  value={province}
+        onChange={(e) => setProvince(e.target.value)}
       ></input>
       <input
         placeholder="Zip/Postal Code"
-        className="mt-10 p-3 w-[1070px] border border-solid"
+        className="mt-10 p-3 w-[1070px] border border-solid"  value={zip}
+        onChange={(e) => setZip(e.target.value)}
       ></input>
       <input
         placeholder="Phone Number"
-        className="mt-10 p-3 w-[1070px] border border-solid"
+        className="mt-10 p-3 w-[1070px] border border-solid"  value={phonenumber}
+        onChange={(e) => setPhonenumber(e.target.value)}
       ></input>
       {/* ///////////////////////////////// */}
       <hr className="h-5 border-gray-400 mt-16" />
@@ -1120,12 +1196,12 @@ const BillingandPayout = () => {
              
           </div>
          </div>
-         <input placeholder='Email address' className='mt-8 p-3 w-[550px] border border-solid'/>
+         <input placeholder='Email address' className='mt-8 p-3 w-[550px] border border-solid' />
         
        <div></div>
        <input placeholder='Confirm email address' className='mt-8 p-3 w-[550px] border border-solid'/>
        <div></div>
-       <button className='mt-8 mb-8 bg-[#ED2A26] p-[10px]  text-white font-medium rounded-sm hover:bg-black'>Set Payout Account</button>
+      
          </div>
          {/* ///////////////////////////////// */}
          <div
@@ -1151,9 +1227,7 @@ const BillingandPayout = () => {
         <div></div>
         <input placeholder="Confirm email address" className="mt-8 p-3 w-[550px] border border-solid" />
         <div></div>
-        <button className="mt-8 mb-8 bg-[#ED2A26] p-[10px] text-white font-medium rounded-sm hover:bg-black">
-          Set Payout Account
-        </button>
+        
       </div>
        {/* ///////////////////////////////// */}
        <div
@@ -1172,9 +1246,11 @@ const BillingandPayout = () => {
             More about Payoneer
           </div>
         </div>
-        <input placeholder="Full Name" className="mt-8 p-3 w-[550px] border border-solid" />
+        <input placeholder="Full Name" className="mt-8 p-3 w-[550px] border border-solid"  value={fullname}
+            onChange={(e) => setFullname(e.target.value)} />
         <div></div>
-        <input placeholder="Your Address" className="mt-8 p-3 w-[550px] border border-solid" />
+        <input placeholder="Your Address" className="mt-8 p-3 w-[550px] border border-solid"  value={youraddress}
+            onChange={(e) => setYouraddress(e.target.value)} />
         <div></div>
         <Select
         defaultValue="VietNam"
@@ -1996,21 +2072,27 @@ const BillingandPayout = () => {
         ]}
       />
       <div></div>
-      <input placeholder="Swift-Code" className="mt-8 p-3 w-[550px] border border-solid" />
+      <input placeholder="Swift-Code" className="mt-8 p-3 w-[550px] border border-solid"  value={swiftcode}
+            onChange={(e) => setSwiftcode(e.target.value)} />
       <div></div>
-      <input placeholder="Back Account Number" className="mt-8 p-3 w-[550px] border border-solid" />
+      <input placeholder="Back Account Number" className="mt-8 p-3 w-[550px] border border-solid"  value={backaccountnumber}
+            onChange={(e) => setBackaccountnumber(e.target.value)} />
       <div></div>
-      <input placeholder="Back Name" className="mt-8 p-3 w-[550px] border border-solid" />
+      <input placeholder="Back Name" className="mt-8 p-3 w-[550px] border border-solid"  value={backname}
+            onChange={(e) => setBackname(e.target.value)} />
       <div></div>
-      <input placeholder="Back Address" className="mt-8 p-3 w-[550px] border border-solid" />
+      <input placeholder="Back Address" className="mt-8 p-3 w-[550px] border border-solid"  value={backaddress}
+            onChange={(e) => setBackaddress(e.target.value)} />
       <div></div>
-        <button className="mt-8 mb-8 bg-[#ED2A26] p-[10px] text-white font-medium rounded-sm hover:bg-black">
-          Set Payout Account
-        </button>
+      
       </div>
 
       {contextHolder}
-       <button className='mt-8 mb-12 bg-[#ED2A26] p-[10px] w-32 text-white font-medium rounded-sm hover:bg-black' onClick={success}>Save Changes</button>
+       <button className='mt-8 mb-12 bg-[#ED2A26] p-[10px] w-32 text-white font-medium rounded-sm hover:bg-black' type="submit" disabled={loading}>Save Changes</button>
+       {loading && <p>Loading...</p>}
+        {error && <p>Error: {error}</p>}
+        {user && <p>Update Successful!</p>}
+    </form>
     </div>
   );
 };
