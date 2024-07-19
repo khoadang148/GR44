@@ -2,7 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getInstructorById } from "../redux/actions/instructor.action";
-import { setMessages, addMessage } from "../redux/actions/chat.action";
+import {
+  setMessages,
+  addMessage,
+  resetMessages,
+} from "../redux/actions/chat.action";
 import { useWebSocket } from "../WebSocketProvider";
 import { Image } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,7 +23,7 @@ const LivestreamDetail = ({ sidebar }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { instructor } = useSelector((state) => state.instructors);
-  const { messages } = useSelector((state) => state.chat);
+  const messages = useSelector((state) => state.chat[id] || []);
   const [inputMessage, setInputMessage] = useState("");
   const [username, setUsername] = useState("");
   const { sendMessage, socket } = useWebSocket();
@@ -27,6 +31,9 @@ const LivestreamDetail = ({ sidebar }) => {
 
   useEffect(() => {
     dispatch(getInstructorById(id));
+    return () => {
+      dispatch(resetMessages(id));
+    };
   }, [dispatch, id]);
 
   useEffect(() => {
@@ -35,7 +42,7 @@ const LivestreamDetail = ({ sidebar }) => {
 
     if (socket) {
       socket.on("loadMessages", (loadedMessages) => {
-        dispatch(setMessages(loadedMessages));
+        dispatch(setMessages(id, loadedMessages));
       });
 
       socket.emit("startLivestream", id);
@@ -55,7 +62,7 @@ const LivestreamDetail = ({ sidebar }) => {
 
     if (socket) {
       socket.on("receiveMessage", (message) => {
-        dispatch(addMessage(message));
+        dispatch(addMessage(id, message));
       });
     }
 
@@ -97,7 +104,7 @@ const LivestreamDetail = ({ sidebar }) => {
                 screenshotFormat="image/jpeg"
                 width={808}
                 height={435}
-                className={`${sidebar ? "w-[800px]" : "w-[1000px]"}`}
+                className={sidebar ? "w-[800px]" : "w-[1000px]"}
               />
             ) : (
               <div>
@@ -128,7 +135,7 @@ const LivestreamDetail = ({ sidebar }) => {
             </div>
             <div>
               <div className="flex">
-                <div className="px-4   bg-white text-[#A9A9A9] hover:text-black">
+                <div className="px-4 bg-white text-[#A9A9A9] hover:text-black">
                   <FontAwesomeIcon
                     icon={faEye}
                     className="py-2 text-center pl-2"
@@ -142,7 +149,7 @@ const LivestreamDetail = ({ sidebar }) => {
                   />
                   <p>1452</p>
                 </div>
-                <div className="px-4  bg-white text-[#A9A9A9] hover:text-black">
+                <div className="px-4 bg-white text-[#A9A9A9] hover:text-black">
                   <FontAwesomeIcon
                     icon={faThumbsDown}
                     className="py-2 text-center pl-2"
