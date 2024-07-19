@@ -28,6 +28,8 @@ const LivestreamDetail = ({ sidebar }) => {
   const [username, setUsername] = useState("");
   const { sendMessage, socket } = useWebSocket();
   const webcamRef = useRef(null);
+    const endOfMessagesRef = useRef(null);
+    const chatContainerRef = useRef(null);
 
   useEffect(() => {
     dispatch(getInstructorById(id));
@@ -91,6 +93,13 @@ const LivestreamDetail = ({ sidebar }) => {
       handleSendMessage();
     }
   };
+  useEffect(() => {
+    chatContainerRef.current?.scrollTo({
+      top: chatContainerRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages]);
+
 
   return (
     <div className="mt-[100px] ml-10">
@@ -169,7 +178,10 @@ const LivestreamDetail = ({ sidebar }) => {
         </div>
         <div className="bg-white px-5 py-5 w-[1000px] ml-10">
           <p className="font-semibold">Live Chat</p>
-          <div className="h-96 overflow-y-scroll relative">
+          <div
+            className="h-96 overflow-y-scroll relative no-scrollbar"
+            ref={chatContainerRef}
+          >
             {messages.map((message, index) => (
               <div key={index} className="mb-4">
                 <strong>{message.username}:</strong> {message.content}
@@ -178,6 +190,7 @@ const LivestreamDetail = ({ sidebar }) => {
                 </span>
               </div>
             ))}
+            <div ref={endOfMessagesRef} />
           </div>
           <div className="flex mt-4">
             <input
