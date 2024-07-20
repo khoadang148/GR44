@@ -22,19 +22,39 @@ import {
   faHeadset,
   faMusic,
   faRuler,
-  
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {  Dropdown,  Space } from "antd";
+import { Dropdown, Menu, Space } from "antd";
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { getAllCourses } from "../redux/actions/course.action";
-import { differenceInDays, differenceInHours, differenceInMinutes, formatDistanceToNow, parse } from "date-fns";
+import {
+  addCourseToSaved,
+  getAllCourses,
+} from "../redux/actions/course.action";
+import {
+  differenceInDays,
+  differenceInHours,
+  differenceInMinutes,
+  formatDistanceToNow,
+  parse,
+} from "date-fns";
 import { Button, Image } from "react-bootstrap";
 
 const HomeScreen = () => {
-  const items = [
+  const userId = useSelector((state) => state.auth.id);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+  }, [dispatch, userId]);
+
+  const handleAddCourse = (courseId) => {
+    if (userId && courseId) {
+      dispatch(addCourseToSaved(userId, courseId));
+    }
+  };
+
+  const createMenuItems = (courseId) => [
     {
       key: "1",
       label: (
@@ -51,11 +71,7 @@ const HomeScreen = () => {
     {
       key: "2",
       label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.aliyun.com"
-        >
+        <a onClick={() => handleAddCourse(courseId)}>
           <HeartOutlined /> Save
         </a>
       ),
@@ -85,9 +101,7 @@ const HomeScreen = () => {
       ),
     },
   ];
- 
-  
- 
+
   const previews = [
     {
       preview:
@@ -121,7 +135,6 @@ const HomeScreen = () => {
     },
   ];
 
-  
   const [startIndex, setStartIndex] = useState(0);
   const visibleAvatars = 6;
   const avatarListRef = useRef(null);
@@ -217,43 +230,47 @@ const HomeScreen = () => {
       setStartIndexxxxx(startIndexxxxx + 1);
     }
   };
-  const dispatch = useDispatch();
+
   const { instructors } = useSelector((state) => state.instructors);
 
-  const recentCourses = useSelector(state => state.enrolledCourses.recentCourses);
-  const newestCourses = useSelector(state => state.enrolledCourses.newestCourses);
-  
+  const recentCourses = useSelector(
+    (state) => state.enrolledCourses.recentCourses
+  );
+  const newestCourses = useSelector(
+    (state) => state.enrolledCourses.newestCourses
+  );
+
   useEffect(() => {
     dispatch(getAllCourses());
   }, [dispatch]);
 
   const timeAgo = (dateString) => {
     try {
-      const date = parse(dateString, 'dd/MM/yyyy', new Date());
-  
+      const date = parse(dateString, "dd/MM/yyyy", new Date());
+
       const now = new Date();
       const minutesDifference = differenceInMinutes(now, date);
-  
+
       if (minutesDifference < 1) {
-        return 'Just now';
+        return "Just now";
       } else if (minutesDifference < 60) {
         return `${minutesDifference} min ago`;
       }
-  
+
       const hoursDifference = differenceInHours(now, date);
       if (hoursDifference < 24) {
         return `${hoursDifference} hours ago`;
       }
-  
+
       const daysDifference = differenceInDays(now, date);
       if (daysDifference < 7) {
         return `${daysDifference} days ago`;
       }
-  
+
       return formatDistanceToNow(date, { addSuffix: true });
     } catch (error) {
-      console.error('Invalid date format or value:', dateString);
-      return ''; // Trả về chuỗi rỗng hoặc giá trị mặc định khác khi có lỗi
+      console.error("Invalid date format or value:", dateString);
+      return ""; // Trả về chuỗi rỗng hoặc giá trị mặc định khác khi có lỗi
     }
   };
   const navigate = useNavigate();
@@ -341,11 +358,11 @@ const HomeScreen = () => {
                 style={{ transform: `translateX(-${startIndexx * 296}px)` }}
                 ref={courseListRef}
               >
-                {recentCourses.map((course, i) => (
+                {recentCourses.map((course) => (
                   <div
-                    key={i}
+                    key={course.id} // Changed from key={i} to key={course.id}
                     className="bg-white shadow-md rounded w-[296px]"
-                    onMouseEnter={() => handleMouseEnter(i)}
+                    onMouseEnter={() => handleMouseEnter(course.id)}
                     onMouseLeave={handleMouseLeave}
                   >
                     <div className="relative">
@@ -359,19 +376,19 @@ const HomeScreen = () => {
                           Bestseller
                         </div>
                       )}
-                      <div className="absolute top-2 left-2 bg-yellow-400 text-white text-sm font-medium   px-2 py-1 rounded ">
+                      <div className="absolute top-2 left-2 bg-yellow-400 text-white text-sm font-medium px-2 py-1 rounded">
                         <StarOutlined /> {course.rate}
                       </div>
-                      <div className="absolute bottom-2 right-2 bg-[#4E4E4E]  text-white text-sm font-medium   px-2 py-1 rounded">
+                      <div className="absolute bottom-2 right-2 bg-[#4E4E4E] text-white text-sm font-medium px-2 py-1 rounded">
                         {course.hours}
                       </div>
-                      <div className="absolute  top-0 shadow-inset-bottom w-[296px] h-[160px]">
-                        {hoveredCourse === i && (
-                          <div className=" inset-0 flex items-center justify-center mt-10   ">
+                      <div className="absolute top-0 shadow-inset-bottom w-[296px] h-[160px]">
+                        {hoveredCourse === course.id && (
+                          <div className="inset-0 flex items-center justify-center mt-10">
                             <Button className="group relative" variant="light">
                               <div className="border-2 border-white p-4 rounded-full group-hover:bg-black group-hover:opacity-30">
                                 <Image
-                                  className="w-[30px] inset-0 h-[35px] ml-2 opacity-100 z-50 "
+                                  className="w-[30px] inset-0 h-[35px] ml-2 opacity-100 z-50"
                                   src={require("../assets/pause.png")}
                                 />
                               </div>
@@ -380,17 +397,13 @@ const HomeScreen = () => {
                         )}
                       </div>
                     </div>
-
                     <div className="p-4">
                       <div className="text-sm text-gray-500 mt-2 flex justify-between items-center">
                         <span>
                           {course.views} views • {timeAgo(course.date)}{" "}
                         </span>
-
                         <Dropdown
-                          menu={{
-                            items,
-                          }}
+                          overlay={<Menu items={createMenuItems(course.id)} />}
                         >
                           <a onClick={(e) => e.preventDefault()}>
                             <Space>
@@ -408,11 +421,10 @@ const HomeScreen = () => {
                           <span className="text-sm">By</span>
                           <h3 className="text-sm">{course.instructor}</h3>
                         </div>
-
-                        <div className="flex items-center gap-4 ">
+                        <div className="flex items-center gap-4">
                           <ShoppingCartOutlined
                             className={`mt-[-5px] hover:text-red-600 ${
-                              hoveredCourse === i ? "block" : "hidden"
+                              hoveredCourse === course.id ? "block" : "hidden"
                             }`}
                           />
                           <h3>{course.price}</h3>
@@ -422,6 +434,7 @@ const HomeScreen = () => {
                   </div>
                 ))}
               </div>
+
               <button
                 onClick={handleNextClickk}
                 disabled={
@@ -456,11 +469,11 @@ const HomeScreen = () => {
                 style={{ transform: `translateX(-${startIndexxx * 296}px)` }}
                 ref={NewcourseListRef}
               >
-                {newestCourses.map((course, k) => (
+                {newestCourses.map((course) => (
                   <div
-                    key={k}
+                    key={course.id} // Changed from key={k} to key={course.id}
                     className="bg-white shadow-md rounded w-[296px]"
-                    onMouseEnter={() => handleMouseEnterr(k)}
+                    onMouseEnter={() => handleMouseEnterr(course.id)}
                     onMouseLeave={handleMouseLeavee}
                   >
                     <div className="relative">
@@ -470,23 +483,23 @@ const HomeScreen = () => {
                         className="w-full h-[160px] object-cover rounded-t"
                       />
                       {course.bestseller && (
-                        <div className="absolute top-2 right-2 bg-[#FA8305] text-white text-sm font-medium  px-2 py-1 rounded">
+                        <div className="absolute top-2 right-2 bg-[#FA8305] text-white text-sm font-medium px-2 py-1 rounded">
                           Bestseller
                         </div>
                       )}
-                      <div className="absolute top-2 left-2 bg-yellow-400 text-white text-sm font-medium   px-2 py-1 rounded ">
+                      <div className="absolute top-2 left-2 bg-yellow-400 text-white text-sm font-medium px-2 py-1 rounded">
                         <StarOutlined /> {course.rate}
                       </div>
-                      <div className="absolute bottom-2 right-2 bg-[#4E4E4E]  text-white text-sm font-medium   px-2 py-1 rounded">
+                      <div className="absolute bottom-2 right-2 bg-[#4E4E4E] text-white text-sm font-medium px-2 py-1 rounded">
                         {course.hours}
                       </div>
-                      <div className="absolute  top-0 shadow-inset-bottom w-[296px] h-[160px]">
-                        {hoveredCoursee === k && (
-                          <div className=" inset-0 flex items-center justify-center mt-10   ">
+                      <div className="absolute top-0 shadow-inset-bottom w-[296px] h-[160px]">
+                        {hoveredCoursee === course.id && (
+                          <div className="inset-0 flex items-center justify-center mt-10">
                             <Button className="group relative" variant="light">
                               <div className="border-2 border-white p-4 rounded-full group-hover:bg-black group-hover:opacity-30">
                                 <Image
-                                  className="w-[30px] inset-0 h-[35px] ml-2 opacity-100 z-50 "
+                                  className="w-[30px] inset-0 h-[35px] ml-2 opacity-100 z-50"
                                   src={require("../assets/pause.png")}
                                 />
                               </div>
@@ -500,11 +513,8 @@ const HomeScreen = () => {
                         <span>
                           {course.views} views • {timeAgo(course.date)}{" "}
                         </span>
-
                         <Dropdown
-                          menu={{
-                            items,
-                          }}
+                          overlay={<Menu items={createMenuItems(course.id)} />}
                         >
                           <a onClick={(e) => e.preventDefault()}>
                             <Space>
@@ -522,11 +532,10 @@ const HomeScreen = () => {
                           <span className="text-sm">By</span>
                           <h3 className="text-sm">{course.instructor}</h3>
                         </div>
-
-                        <div className="flex items-center gap-4 ">
+                        <div className="flex items-center gap-4">
                           <ShoppingCartOutlined
                             className={`mt-[-5px] hover:text-red-600 ${
-                              hoveredCoursee === k ? "block" : "hidden"
+                              hoveredCoursee === course.id ? "block" : "hidden"
                             }`}
                           />
                           <h3>{course.price}</h3>
@@ -541,7 +550,7 @@ const HomeScreen = () => {
                 disabled={
                   startIndexxx >= newestCourses.length - visibleNewestCourses
                 }
-                className="group bg-white hover:bg-red-600 absolute right-[0px] z-50 cursor-pointer px-2 py-0 rounded-[5px]  top-36"
+                className="group bg-white hover:bg-red-600 absolute right-[0px] z-50 cursor-pointer px-2 py-0 rounded-[5px] top-36"
               >
                 <h1 className="group-hover:text-white">{">"}</h1>
               </button>
