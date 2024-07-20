@@ -17,6 +17,9 @@ import {
   FETCH_SAVED_COURSES_SUCCESS,
   FETCH_SAVED_COURSES_REQUEST,
   FETCH_SAVED_COURSES_FAILURE,
+  ADD_SAVED_COURSES_REQUEST,
+  ADD_SAVED_COURSES_SUCCESS,
+  ADD_SAVED_COURSES_FAILURE,
 } from "../actionType";
 import { differenceInDays, parse, isValid } from "date-fns";
 
@@ -203,6 +206,45 @@ export const deleteSavedCourses = (userId) => {
     } catch (error) {
       dispatch({
         type: DELETE_SAVED_COURSES_FAILURE,
+        error: error.message,
+      });
+    }
+  };
+};
+export const addCourseToSaved = (userId, courseId) => {
+  return async (dispatch) => {
+    dispatch({ type: ADD_SAVED_COURSES_REQUEST });
+    try {
+      const userResponse = await axios.get(`${API_URL}/users/${userId}`);
+      const savedCourses = userResponse.data.savedCourses || [];
+
+      if (!savedCourses.includes(courseId)) {
+        const updatedSavedCourses = [...savedCourses, courseId];
+
+        await axios.put(`${API_URL}/users/${userId}`, {
+          ...userResponse.data,
+          savedCourses: updatedSavedCourses,
+        });
+
+        dispatch({
+          type: ADD_SAVED_COURSES_SUCCESS,
+          payload: updatedSavedCourses,
+        });
+
+        dispatch({
+          type: FETCH_SAVED_COURSES_SUCCESS,
+          payload: updatedSavedCourses,
+        });
+      } else {
+        // Optional: Handle the case where the course is already saved
+        dispatch({
+          type: ADD_SAVED_COURSES_FAILURE,
+          error: "Course is already saved.",
+        });
+      }
+    } catch (error) {
+      dispatch({
+        type: ADD_SAVED_COURSES_FAILURE,
         error: error.message,
       });
     }

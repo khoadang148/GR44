@@ -16,6 +16,9 @@ import {
   FETCH_ENROLLED_COURSES_SUCCESS,
   FETCH_ENROLLED_COURSES_REQUEST,
   FETCH_ENROLLED_COURSES_FAILURE,
+  ADD_SAVED_COURSES_REQUEST,
+  ADD_SAVED_COURSES_SUCCESS,
+  ADD_SAVED_COURSES_FAILURE,
 } from "../actionType";
 
 const initialState = {
@@ -129,6 +132,24 @@ const enrolledCoursesReducer = (state = initialState, action) => {
         loading: false,
         error: action.error,
       };
+      case ADD_SAVED_COURSES_REQUEST:
+        return {
+          ...state,
+          loading: true,
+          error: null,
+        };
+      case ADD_SAVED_COURSES_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          savedCourses: action.payload,
+        };
+      case ADD_SAVED_COURSES_FAILURE:
+        return {
+          ...state,
+          loading: false,
+          error: action.error,
+        };
     default:
       return state;
   }

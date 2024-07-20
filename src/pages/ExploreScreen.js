@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { Button, Image, Spinner, Alert } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Dropdown, Space } from "antd";
+import { Dropdown, Menu, Space } from "antd";
 import {
+  addCourseToSaved,
   getAllCourses,
   getEnrolledCourses,
   searchCourses,
@@ -25,6 +26,16 @@ const ExploreScreen = ({ sidebar }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [coursesToShow, setCoursesToShow] = useState(8);
   const [noInstructors, setNoInstructors] = useState(false); // State to track if there are no instructors
+  const userId = useSelector((state) => state.auth.id);
+  const dispatch = useDispatch();
+
+  useEffect(() => {}, [dispatch, userId]);
+
+  const handleAddCourse = (courseId) => {
+    if (userId && courseId) {
+      dispatch(addCourseToSaved(userId, courseId));
+    }
+  };
 
   const loadMoreRef = useRef(null);
 
@@ -52,8 +63,6 @@ const ExploreScreen = ({ sidebar }) => {
     (state) => state.enrolledCourses
   );
   const { instructors } = useSelector((state) => state.instructors);
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getAllCourses());
@@ -100,7 +109,7 @@ const ExploreScreen = ({ sidebar }) => {
     };
   }, []);
 
-  const items = [
+  const createMenuItems = (courseId) => [
     {
       key: "1",
       label: (
@@ -117,11 +126,7 @@ const ExploreScreen = ({ sidebar }) => {
     {
       key: "2",
       label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.aliyun.com"
-        >
+        <a onClick={() => handleAddCourse(courseId)}>
           <HeartOutlined /> Save
         </a>
       ),
@@ -324,14 +329,12 @@ const ExploreScreen = ({ sidebar }) => {
                   </div>
 
                   <Dropdown
-                    menu={{
-                      items,
-                    }}
-                    className="ml-[140px] mt-[15px]"
+                    overlay={<Menu items={createMenuItems(course.id)} />}
+                    className="ml-[150px] mt-[15px]"
                   >
                     <a onClick={(e) => e.preventDefault()}>
                       <Space>
-                        <MoreOutlined className="text-2xl hover:text-black " />
+                        <MoreOutlined className="text-2xl hover:text-black" />
                       </Space>
                     </a>
                   </Dropdown>

@@ -30,7 +30,7 @@ const CourseCard = ({
     <div className="relative w-[350px] h-full">
       <div>
         <Image
-          src={thumbnail}
+          src={thumbnail || ''}
           className="w-[350px] h-[180px] object-cover rounded-sm"
         />
       </div>
@@ -97,14 +97,13 @@ const SavedCourses = ({ sidebar }) => {
   };
 
   const handleConfirmDelete = () => {
-    dispatch(deleteSavedCourses(userId)); 
+    dispatch(deleteSavedCourses(userId));
     setShowDeleteConfirmation(false);
   };
 
   const handleCancelDelete = () => {
     setShowDeleteConfirmation(false);
   };
-
 
   const handleMouseEnter = (index) => {
     setHoveredCourse(index);
@@ -115,8 +114,7 @@ const SavedCourses = ({ sidebar }) => {
   };
 
   const handleRemoveAll = () => {
-    // Implement logic to remove all saved courses
-    dispatch(deleteSavedCourses(userId));
+    setShowDeleteConfirmation(true);
   };
 
   return (
@@ -124,15 +122,15 @@ const SavedCourses = ({ sidebar }) => {
       <div className="col-span-1 w-[400px]">
         <div className="flex justify-between items-center">
           <h2 className="text-base font-medium">Saved Courses</h2>
-          <button className="text-sm text-gray-700 font-normal" >
-            Remove All 
+          <button className="text-sm text-gray-700 font-normal" onClick={handleRemoveAll}>
+            Remove All
           </button>
         </div>
         <hr className="my-2" />
         <p className="text-gray-500 text-sm">{savedCourses.length} Courses</p>
-        <button className="bg-[#ED2927] hover:bg-[#333333] text-white w-full py-2 rounded-sm mt-4" onClick={handleDeleteCourse}>
+        <button className="bg-[#ED2927] hover:bg-[#333333] text-white w-full py-2 rounded-sm mt-4" onClick={handleRemoveAll}>
           <FontAwesomeIcon icon={faTrashAlt} className="mr-2" />
-          <span className="text-sm" >Remove Saved Courses</span>
+          <span className="text-sm">Remove Saved Courses</span>
         </button>
         {showDeleteConfirmation && (
           <div className="mt-4">
@@ -161,22 +159,24 @@ const SavedCourses = ({ sidebar }) => {
       >
         <h1 className="text-xl font-medium">Saved Courses</h1>
         {savedCourses.map((course, index) => (
-          <CourseCard
-            key={course.id}
-            thumbnail={course.thumbnail}
-            rate={course.rate}
-            title={course.title}
-            category={course.category}
-            instructor={course.instructor}
-            hours={course.hours}
-            price={course.price}
-            views={course.views}
-            date={course.date}
-            index={index}
-            hoveredCourse={hoveredCourse}
-            handleMouseEnter={handleMouseEnter}
-            handleMouseLeave={handleMouseLeave}
-          />
+          course && (
+            <CourseCard
+              key={course.id}
+              thumbnail={course.thumbnail}
+              rate={course.rate}
+              title={course.title}
+              category={course.category}
+              instructor={course.instructor}
+              hours={course.hours}
+              price={course.price}
+              views={course.views}
+              date={course.date}
+              index={index}
+              hoveredCourse={hoveredCourse}
+              handleMouseEnter={handleMouseEnter}
+              handleMouseLeave={handleMouseLeave}
+            />
+          )
         ))}
       </div>
     </div>
