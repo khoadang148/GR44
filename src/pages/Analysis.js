@@ -838,3 +838,311 @@ const Analysis = () => {
 };
 
 export default Analysis;
+
+
+/*import { ArrowDownOutlined, ArrowUpOutlined, StockOutlined } from "@ant-design/icons";
+import { Statistic, Table } from "antd";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { getAllCourses } from "../redux/actions/course.action";
+import { fetchAnalysisData } from "../redux/actions/analysis.action";
+
+const Analysis = () => {
+  const [activeTab, setActiveTab] = useState("User");
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(fetchAnalysisData());
+    dispatch(getAllCourses());
+  }, [dispatch]);
+
+  const { data, loading, error } = useSelector((state) => state.analysis);
+  const { courses } = useSelector((state) => state.enrolledCourses);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  const {
+    userData = [],
+    VisitorsData = [],
+    saleData = [],
+    SaveYearData = [],
+    avePageData = []
+  } = data || {};
+
+  const dataSource = courses.map((course, index) => ({
+    key: index,
+    itemNo: index + 1,
+    Thumbnail: course.thumbnail, 
+    Title: course.title,         
+    Purchases: course.purchases, 
+    Comments: course.comments,   
+    Views: course.views,        
+  }));
+  
+  const columns = [
+    {
+      title: 'Item No.',
+      dataIndex: 'itemNo',
+      key: 'itemNo',
+    },
+    {
+      title: 'Thumbnail',
+      dataIndex: 'Thumbnail',
+      key: 'Thumbnail',
+      render: (text) => <img src={text} alt="thumbnail" style={{ width: 150, height: 100 }} />
+    },
+    {
+      title: 'Title',
+      dataIndex: 'Title',
+      key: 'Title',
+    },
+    {
+      title: 'Purchases',
+      dataIndex: 'Purchases',
+      key: 'Purchases',
+    },
+    {
+      title: 'Comments',
+      dataIndex: 'Comments',
+      key: 'Comments',
+    },
+    {
+      title: 'Views',
+      dataIndex: 'Views',
+      key: 'Views',
+    },
+  ];
+
+  const renderTooltipUV = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const uvData = payload.find((entry) => entry.dataKey === "uv");
+      if (uvData) {
+        return (
+          <div className="custom-tooltip rounded-sm">
+            <p className="label">{`${payload[0].payload.name}`}</p>
+            <p className="uv">{`Old: ${uvData.value}`}</p>
+          </div>
+        );
+      }
+    }
+    return null;
+  };
+
+  const renderTooltipPV = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const pvData = payload.find((entry) => entry.dataKey === "pv");
+      if (pvData) {
+        return (
+          <div className="custom-tooltip rounded-sm">
+            <p className="label">{`${payload[0].payload.name}`}</p>
+            <p className="uv">{`New: ${pvData.value}`}</p>
+          </div>
+        );
+      }
+    }
+    return null;
+  };
+
+  const renderTooltipSale = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip rounded-sm">
+          <p className="label">{`${payload[0].payload.name}`}</p>
+          <p className="uv">{`Sale: ${payload[0].value}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const renderTooltipYearly = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const uv = payload[0].value;
+      return (
+        <div className="custom-tooltip rounded-sm bg-white p-2 shadow-md">
+          <p className="label font-medium">{` ${label}`}</p>
+          <p className="value">{` $${uv}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const renderTooltipAvePage = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const uv = payload[0].value;
+      return (
+        <div className="custom-tooltip rounded-sm bg-white p-2 shadow-md">
+          <p className="label font-medium">{`${payload[0].payload.name}`}</p>
+          <p className="value">{` ${uv}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="mt-20 ml-5 bg-[#F7F7F7]">
+      <div className="flex gap-5 items-center">
+        <StockOutlined className="text-3xl" />
+        <h3 className="text-2xl mt-2">Analysis</h3>
+      </div>
+      <div className="mt-10 flex gap-5">
+        <div className="w-[500px] bg-[#FFFFFF] p-5">
+          <h1 className="text-2xl">839</h1>
+          <div className="text-lg">Subscribers</div>
+          <ResponsiveContainer width="100%" height={100}>
+            <BarChart
+              data={data}
+              margin={{ right: 10, left: 10 }}
+            >
+              <Tooltip
+                content={renderTooltipUV}
+                wrapperStyle={{ backgroundColor: "rgba(255,255,255,0.9)" }}
+              />
+              <Bar dataKey="uv" fill="#ED2A26" barSize={15} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="w-[500px] bg-[#FFFFFF] p-5">
+          <h1 className="text-2xl">950</h1>
+          <div className="text-lg">Weekly Visitors</div>
+          <div className="relative" style={{ height: 100 }}>
+            <div
+              style={{
+                position: "absolute",
+                width: "100%",
+                height: "100px",
+                pointerEvents: "none",
+              }}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={VisitorsData}>
+                  <Tooltip content={renderTooltipUV} />
+                  <Line
+                    type="monotone"
+                    dataKey="uv"
+                    stroke="#FFC136"
+                    activeDot={{ r: 8 }}
+                    strokeWidth={2}
+                    dot={{ pointerEvents: "auto" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                width: "100%",
+                height: "100px",
+                pointerEvents: "none",
+              }}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={VisitorsData}>
+                  <Tooltip content={renderTooltipPV} />
+                  <Line
+                    type="monotone"
+                    dataKey="pv"
+                    stroke="#ED2A26"
+                    activeDot={{ r: 8 }}
+                    strokeWidth={2}
+                    dot={{ pointerEvents: "auto" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+        <div className="w-[500px] bg-[#FFFFFF] p-5">
+          <h1 className="text-2xl">20</h1>
+          <div className="text-lg">Weekly Sales</div>
+          <div style={{ width: "100%", height: 100 }}>
+            <ResponsiveContainer>
+              <AreaChart data={saleData}>
+                <Tooltip content={renderTooltipSale} />
+                <Area
+                  type="linear"
+                  dataKey="uv"
+                  stroke="#FFA052"
+                  fill="#FFE9D8"
+                  strokeWidth={2}
+                  activeDot={{ r: 8 }}
+                  dot={{ r: 4 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+      <div className="border border-solid mt-10 bg-[#FFFFFF]">
+        <h1 className="text-xl p-5">Sales Of The Year</h1>
+        <hr />
+        <div style={{ width: "100%", height: 400 }}>
+          <ResponsiveContainer>
+            <AreaChart data={SaveYearData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip content={renderTooltipYearly} />
+              <Area
+                type="monotone"
+                dataKey="uv"
+                stroke="#F5A623"
+                fill="#F7C1A0"
+                strokeWidth={2}
+                activeDot={{ r: 8 }}
+                dot={{ r: 4 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      <div className="border border-solid mt-10 bg-[#FFFFFF]">
+        <h1 className="text-xl p-5">Average Pageviews Per User</h1>
+        <hr />
+        <div style={{ width: "100%", height: 400 }}>
+          <ResponsiveContainer>
+            <AreaChart data={avePageData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip content={renderTooltipAvePage} />
+              <Area
+                type="monotone"
+                dataKey="uv"
+                stroke="#56C0E9"
+                fill="#D0E9F3"
+                strokeWidth={2}
+                activeDot={{ r: 8 }}
+                dot={{ r: 4 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      <Table dataSource={dataSource} columns={columns} pagination={false} />
+    </div>
+  );
+};
+
+export default Analysis;
+*/
+
+
+
+

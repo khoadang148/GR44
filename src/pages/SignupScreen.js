@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { Form, Input, Button, Checkbox } from "antd";
-import { signup } from "../redux/actions/auth.action";
-
+import { signup, checkEmail } from "../redux/actions/auth.action";
 
 const logoUrl = "https://gambolthemes.net/html-items/cursus-new-demo/images/logo.svg";
 const signBackgroundUrl = "https://gambolthemes.net/html-items/cursus-new-demo/images/sign.svg";
@@ -13,11 +12,21 @@ const SignupScreen = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user);
+  const { emailExists, loading: checkingEmail } = useSelector((state) => state.auth);
 
   const handleSignup = async (values) => {
     setLoading(true);
     try {
+      // Check if email already exists
+      await dispatch(checkEmail(values.email));
+
+      if (emailExists) {
+        setLoading(false);
+        alert("Email already exists. Please enter a different email.");
+        return;
+      }
+
+      // Proceed with signup if email is not taken
       await dispatch(signup(values.fullname, values.email, values.password));
       setLoading(false);
       navigate("/signupstep");
@@ -34,7 +43,6 @@ const SignupScreen = () => {
     }
     return Promise.reject("Please enter a valid Gmail address!");
   };
-  
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 relative">
@@ -101,7 +109,7 @@ const SignupScreen = () => {
               <Button
                 type="primary"
                 htmlType="submit"
-                loading={loading}
+                loading={loading || checkingEmail}
                 block
                 className="bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >

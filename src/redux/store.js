@@ -13,7 +13,7 @@ import chatReducer from "./reducers/chat.reducer";
 import userReducer from "./reducers/user.reducer";
 import earningReducer from "./reducers/earning.reducer";
 import verificationReducer from "./reducers/verification.reducer"; 
-
+import analysisReducer from "./reducers/analysis.reducer";
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -28,6 +28,7 @@ const rootReducer = combineReducers({
   userUpdate: userReducer,
   earning: earningReducer,
   verification: verificationReducer,
+  analysis: analysisReducer,
 });
 
 const store = createStore(
