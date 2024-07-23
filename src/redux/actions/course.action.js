@@ -20,6 +20,15 @@ import {
   ADD_SAVED_COURSES_REQUEST,
   ADD_SAVED_COURSES_SUCCESS,
   ADD_SAVED_COURSES_FAILURE,
+  ADD_SHOPPING_COURSES_REQUEST,
+  FETCH_SHOPPING_COURSES_REQUEST,
+  FETCH_SHOPPING_COURSES_SUCCESS,
+  FETCH_SHOPPING_COURSES_FAILURE,
+  ADD_SHOPPING_COURSES_SUCCESS,
+  ADD_SHOPPING_COURSES_FAILURE,
+  DELETE_SHOPPING_COURSES_REQUEST,
+  DELETE_SHOPPING_COURSES_SUCCESS,
+  DELETE_SHOPPING_COURSES_FAILURE,
 } from "../actionType";
 import { differenceInDays, parse, isValid } from "date-fns";
 
@@ -245,6 +254,118 @@ export const addCourseToSaved = (userId, courseId) => {
     } catch (error) {
       dispatch({
         type: ADD_SAVED_COURSES_FAILURE,
+        error: error.message,
+      });
+    }
+  };
+};
+
+export const getShoppingCart = (userId) => {
+  return async (dispatch) => {
+    dispatch({ type: FETCH_SHOPPING_COURSES_REQUEST });
+    try {
+      const userResponse = await axios.get(`${API_URL}/users/${userId}`);
+      const shoppingCartIds = userResponse.data.shoppingCart;
+
+      const coursesResponse = await axios.get(`${API_URL}/courses`);
+
+      const filteredCourses = coursesResponse.data.filter((course) =>
+        shoppingCartIds.includes(course.id)
+      );
+
+      console.log(filteredCourses);
+      dispatch({
+        type: FETCH_SHOPPING_COURSES_SUCCESS,
+        payload: filteredCourses,
+      });
+    } catch (error) {
+      dispatch({
+        type: FETCH_SHOPPING_COURSES_FAILURE,
+        error: error.message,
+      });
+    }
+  };
+};
+
+export const addCourseToShoppingCart = (userId, courseId) => {
+  return async (dispatch) => {
+    dispatch({ type: ADD_SHOPPING_COURSES_REQUEST });
+    try {
+      const userResponse = await axios.get(`${API_URL}/users/${userId}`);
+      const shoppingCart = userResponse.data.shoppingCart || [];
+
+      if (!shoppingCart.includes(courseId)) {
+        const updatedShoppingCart = [...shoppingCart, courseId];
+
+        await axios.put(`${API_URL}/users/${userId}`, {
+          ...userResponse.data,
+          shoppingCart: updatedShoppingCart,
+        });
+
+        dispatch({
+          type: ADD_SHOPPING_COURSES_SUCCESS,
+          payload: updatedShoppingCart,
+        });
+
+        dispatch({
+          type: FETCH_SHOPPING_COURSES_SUCCESS,
+          payload: updatedShoppingCart,
+        });
+      } else {
+        dispatch({
+          type: ADD_SHOPPING_COURSES_FAILURE,
+          error: "Course is already in the shopping cart.",
+        });
+      }
+    } catch (error) {
+      dispatch({
+        type: ADD_SHOPPING_COURSES_FAILURE,
+        error: error.message,
+      });
+    }
+  };
+};
+
+export const deleteShoppingCartItem = (userId, courseId) => {
+  return async (dispatch) => {
+    dispatch({ type: DELETE_SHOPPING_COURSES_REQUEST });
+    try {
+      const userResponse = await axios.get(`${API_URL}/users/${userId}`);
+      const shoppingCart = userResponse.data.shoppingCart;
+      const deleteShopCartNew = shoppingCart.filter(
+        (course) => course !== courseId
+      );
+
+      await axios.put(`${API_URL}/users/${userId}`, {
+        ...userResponse.data,
+        shoppingCart: deleteShopCartNew,
+      });
+
+      dispatch({
+        type: DELETE_SHOPPING_COURSES_SUCCESS,
+        payload: deleteShopCartNew,
+      });
+
+      const updatedUserResponse = await axios.get(`${API_URL}/users/${userId}`);
+      const shoppingCartIds = updatedUserResponse.data.shoppingCart.map(
+        (course) => course.id
+      );
+
+      const shoppingCartResponse = await axios.get(`${API_URL}/courses`, {
+        params: { id: shoppingCartIds.join("") },
+      });
+
+      const filteredShoppingCart = shoppingCartResponse.data.filter((course) =>
+        updatedUserResponse.data.shoppingCart.includes(course.id)
+      );
+
+      dispatch({
+        type: FETCH_SHOPPING_COURSES_SUCCESS,
+        payload: filteredShoppingCart,
+      });
+    } catch (error) {
+      dispatch({
+        type: DELETE_SHOPPING_COURSES_FAILURE,
         error: error.message,
       });
     }

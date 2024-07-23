@@ -39,9 +39,9 @@ const Basic = ({ courseData, setCourseData, setCurrent }) => {
   };
 
   const items = [
-    { label: "Beginner", key: "0" },
-    { label: "Intermediate", key: "1" },
-    { label: "Expert", key: "2" },
+    { label: "Web Development | Python", key: "0" },
+    { label: "Development | JavaScript", key: "1" },
+    { label: "Development | C++", key: "2" },
   ];
 
   const audioItems = [
@@ -62,7 +62,7 @@ const Basic = ({ courseData, setCourseData, setCurrent }) => {
     setSelectedLevel(selectedItem.label);
     setCourseData({
       ...courseData,
-      level: selectedItem.label,
+      language: selectedItem.label,
     });
     setIsLevelSelected(true);
   };
@@ -164,7 +164,7 @@ const Basic = ({ courseData, setCourseData, setCurrent }) => {
                       onClick: handleMenuLevel,
                     }}
                     trigger={["click"]}
-                    value={courseData.level}
+                    value={courseData.language}
                     onClick={(e) => e.preventDefault()}
                   >
                     <Space>

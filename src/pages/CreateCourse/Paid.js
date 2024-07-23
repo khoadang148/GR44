@@ -16,12 +16,12 @@ const Paid = ({ sidebar, courseData, setCourseData, setCurrent }) => {
         <p className="text-[14px] font-semibold">Regular Price*</p>
         <div className="flex items-center">
           <input
-            name="regularPrice"
+            name="price"
             type="number"
             placeholder="$0"
             className="border w-[360px] pl-3 h-10 object-cover"
             onChange={handleChange}
-            value={courseData.regularPrice}
+            value={courseData.price}
           />
           <p className="bg-[#F7F7F7] ml-[-45px] mt-2 p-2 rounded-sm text-[12px] font-bold">
             USD
