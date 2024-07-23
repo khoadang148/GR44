@@ -2,6 +2,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
+
 import {
   LOGIN_FAILURE,
   LOGIN_REQUEST,
@@ -21,7 +22,8 @@ import {
   FETCH_USERS_FAILURE,
   UPDATE_USER_ROLE_REQUEST,
   UPDATE_USER_ROLE_SUCCESS,
-  UPDATE_USER_ROLE_FAILURE
+  UPDATE_USER_ROLE_FAILURE,
+  CHECK_EMAIL, CHECK_EMAIL_SUCCESS, CHECK_EMAIL_FAILURE
 
 } from "../actionType";
 
@@ -223,4 +225,21 @@ export const updateUserRole = (userId, role) => {
     }
   };
 };
+
+// Check if email exists
+export const checkEmail = (email) => async (dispatch) => {
+  dispatch({ type: CHECK_EMAIL });
+
+  try {
+    const response = await axios.get(API_URL, { params: { email } });
+    if (response.data.length > 0) {
+      dispatch({ type: CHECK_EMAIL_SUCCESS, payload: true });
+    } else {
+      dispatch({ type: CHECK_EMAIL_SUCCESS, payload: false });
+    }
+  } catch (error) {
+    dispatch({ type: CHECK_EMAIL_FAILURE, payload: error.message });
+  }
+};
+
 

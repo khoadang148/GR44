@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { Form, Input, Button, Checkbox } from "antd";
 import { login } from "../redux/actions/auth.action";
+import { socialLogin } from '../authSlice'; 
+
 import Cookies from "js-cookie";
 import {
   FaFacebook,
@@ -59,13 +61,27 @@ const LoginScreen = () => {
     }
   };
 
-  const handleSocialLogin = async (provider) => {
-    console.log(`Logging in with ${provider}`);
+  const handleSocialLogin = async (providerName) => {
+    setLoading(true);
+    try {
+      const resultAction = await dispatch(socialLogin({ providerName })).unwrap();
+      // Ghi nhận thông tin người dùng và chuyển hướng
+      if (resultAction) {
+        // Thực hiện các hành động cần thiết sau khi đăng nhập thành công
+        navigate("/home");
+      }
+    } catch (error) {
+      console.error("Social login error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   const goToSignUp = () => {
     navigate("/signup");
   };
+  
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 relative">

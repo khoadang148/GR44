@@ -12,9 +12,27 @@ import { logout } from "../redux/actions/auth.action";
 const Header = ({ handleToggleSidebar }) => {
   const navigate = useNavigate();
 
-  const toggleDarkMode = () => {
-    document.documentElement.classList.toggle('dark');
-  }
+  // Hàm chuyển đổi chế độ dark mode
+  const toggleDarkMode = (checked) => {
+    const htmlElement = document.documentElement;
+    if (checked) {
+      htmlElement.classList.add('dark');
+      localStorage.setItem('dark-mode', 'true');
+    } else {
+      htmlElement.classList.remove('dark');
+      localStorage.setItem('dark-mode', 'false');
+    }
+  };
+
+  // Khi tải trang, áp dụng chế độ dark mode đã lưu
+  React.useEffect(() => {
+    const savedDarkMode = localStorage.getItem('dark-mode') === 'true';
+    if (savedDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
   const avatar = Cookies.get('avatar');
   const username = Cookies.get('username');
   const email = Cookies.get('email');
@@ -242,7 +260,7 @@ const handleLogout = () => {
       
               <MoonOutlined className="text-xl bg-[#FFECEC] dark:bg-gray-700  rounded-full px-3 py-3" />
               <h1 className="mt-3 text-black dark:text-gray-200">Night mode</h1>
-              <Switch className="mt-3" defaultChecked={false} onChange={onChange} onClick={toggleDarkMode} />
+          <Switch className="mt-3" defaultChecked={localStorage.getItem('dark-mode') === 'true'} onChange={toggleDarkMode} />
         </div>
       </Menu.Item>
       <Menu.Item key="3">

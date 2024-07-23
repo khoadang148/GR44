@@ -16,13 +16,14 @@ import {
   FETCH_USERS_FAILURE,
   UPDATE_USER_ROLE_REQUEST,
   UPDATE_USER_ROLE_SUCCESS,
-  UPDATE_USER_ROLE_FAILURE
+  UPDATE_USER_ROLE_FAILURE,
+  CHECK_EMAIL, CHECK_EMAIL_SUCCESS, CHECK_EMAIL_FAILURE
 } from '../actionType';
 
 const initialState = {
   token: Cookies.get("token") || null, 
   role: Cookies.get("role") || null, 
-  user: [],
+  user: Cookies.get("user") || null, 
   error: null,
   loading: false,
   id: Cookies.get("id") || null,
@@ -32,6 +33,7 @@ const initialState = {
   forgotPassword: {
     defaultPassword: null,
     error: null,
+    emailExists: false,
   }
 };
 
@@ -126,10 +128,16 @@ const authReducer = (state = initialState, action) => {
         users: updatedUsers, };
     case UPDATE_USER_ROLE_FAILURE:
       return { ...state, loading: false, error: action.error };
-    default:
-      return state;
-  }
-};
 
+       case CHECK_EMAIL:
+      return { ...state, loading: true };
+    case CHECK_EMAIL_SUCCESS:
+      return { ...state, loading: false, emailExists: action.payload };
+    case CHECK_EMAIL_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+      default:
+        return state;
+    }
+  };
 
 export default authReducer;

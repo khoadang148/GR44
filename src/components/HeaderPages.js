@@ -8,7 +8,7 @@ const HeaderPages = () => {
     navigate('/home');
   };
   return (
-    <div className="p-4 z-50 flex items-center justify-between bg-white h-[60px] w-full fixed top-0 left-0 shadow-sm">
+<div className="z-50 flex bg-white dark:bg-gray-900 text-black dark:text-white h-[65px] w-full drop-shadow-lg fixed">
       <div>
         <button
           onClick={handleBackClick}
