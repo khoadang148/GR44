@@ -43,11 +43,18 @@ const HTML = ({ courseData, setCourseData }) => {
   return (
     <div className="pt-5 -ml-[20px]">
       <div className=" pb-6 bg-white w-[480px] h-[150px] text-center pt-3">
-        <Upload {...uploadProps}>
+        {/* <Upload {...uploadProps}>
           <button className="border-red-500 font-semibold border px-5 py-2 mt-5 text-red-500 shadow-md">
             UPLOAD VIDEO
           </button>
-        </Upload>
+        </Upload> */}
+        <input
+          name="date"
+          placeholder="Course title here"
+          className="border mt-4 border-gray-200 w-[50%] h-10 pl-5 font-normal"
+          value={courseData.date}
+          onChange={handleChange}
+        />
         <p className="pt-4 text-[14px]">File Format: .mp4</p>
       </div>
       <div>

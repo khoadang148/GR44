@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import {
   addCourseToSaved,
+  addCourseToShoppingCart,
   getAllCourses,
 } from "../redux/actions/course.action";
 import {
@@ -53,6 +54,12 @@ const HomeScreen = () => {
       dispatch(addCourseToSaved(userId, courseId));
     }
   };
+   const handleShoppingCourse = (courseId) => {
+     if (userId && courseId) {
+       dispatch(addCourseToShoppingCart(userId, courseId));
+     }
+   };
+
 
   const createMenuItems = (courseId) => [
     {
@@ -422,11 +429,15 @@ const HomeScreen = () => {
                           <h3 className="text-sm">{course.instructor}</h3>
                         </div>
                         <div className="flex items-center gap-4">
-                          <ShoppingCartOutlined
-                            className={`mt-[-5px] hover:text-red-600 ${
-                              hoveredCourse === course.id ? "block" : "hidden"
-                            }`}
-                          />
+                          <button
+                            onClick={() => handleShoppingCourse(course.id)}
+                          >
+                            <ShoppingCartOutlined
+                              className={`mt-[-5px] hover:text-red-600 ${
+                                hoveredCourse === course.id ? "block" : "hidden"
+                              }`}
+                            />
+                          </button>
                           <h3>{course.price}</h3>
                         </div>
                       </div>

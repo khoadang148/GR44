@@ -44,13 +44,14 @@ export const initialCourseData = {
   description: "",
   learnings: "",
   requirements: "",
-  level: "",
+  language: "",
   audioLanguage: "",
   closeCaption: "",
   category: "",
   regularPrice: "",
   discountPrice: "",
   thumbnail: "",
+  price: "",
 };
 
 const CreateCourse = () => {

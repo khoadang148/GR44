@@ -19,6 +19,15 @@ import {
   ADD_SAVED_COURSES_REQUEST,
   ADD_SAVED_COURSES_SUCCESS,
   ADD_SAVED_COURSES_FAILURE,
+  FETCH_SHOPPING_COURSES_REQUEST,
+  FETCH_SHOPPING_COURSES_SUCCESS,
+  FETCH_SHOPPING_COURSES_FAILURE,
+  ADD_SHOPPING_COURSES_REQUEST,
+  ADD_SHOPPING_COURSES_SUCCESS,
+  ADD_SHOPPING_COURSES_FAILURE,
+  DELETE_SHOPPING_COURSES_REQUEST,
+  DELETE_SHOPPING_COURSES_SUCCESS,
+  DELETE_SHOPPING_COURSES_FAILURE,
 } from "../actionType";
 
 const initialState = {
@@ -26,6 +35,7 @@ const initialState = {
   recentCourses: [],
   newestCourses: [],
   savedCourses: [],
+  shoppingCourses: [],
   loading: false,
   error: "",
 };
@@ -132,24 +142,78 @@ const enrolledCoursesReducer = (state = initialState, action) => {
         loading: false,
         error: action.error,
       };
-      case ADD_SAVED_COURSES_REQUEST:
-        return {
-          ...state,
-          loading: true,
-          error: null,
-        };
-      case ADD_SAVED_COURSES_SUCCESS:
-        return {
-          ...state,
-          loading: false,
-          savedCourses: action.payload,
-        };
-      case ADD_SAVED_COURSES_FAILURE:
-        return {
-          ...state,
-          loading: false,
-          error: action.error,
-        };
+    case ADD_SAVED_COURSES_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+    case ADD_SAVED_COURSES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        savedCourses: action.payload,
+      };
+    case ADD_SAVED_COURSES_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
+    case FETCH_SHOPPING_COURSES_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+    case FETCH_SHOPPING_COURSES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        shoppingCourses: action.payload,
+      };
+    case FETCH_SHOPPING_COURSES_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
+    case ADD_SHOPPING_COURSES_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+    case ADD_SHOPPING_COURSES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        shoppingCourses: action.payload,
+      };
+    case ADD_SHOPPING_COURSES_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
+    case DELETE_SHOPPING_COURSES_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+    case DELETE_SHOPPING_COURSES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        shoppingCourses: action.payload,
+      };
+    case DELETE_SHOPPING_COURSES_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
     default:
       return state;
   }
