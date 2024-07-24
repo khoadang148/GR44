@@ -259,6 +259,36 @@ export const addCourseToSaved = (userId, courseId) => {
     }
   };
 };
+export const deleteSavedCourseByCourseId = (userId, courseId) => {
+  return async (dispatch) => {
+    dispatch({ type: DELETE_SAVED_COURSES_REQUEST });
+    try {
+      const userResponse = await axios.get(`${API_URL}/users/${userId}`);
+      const savedCourses = userResponse.data.savedCourses || [];
+      const updatedSavedCourses = savedCourses.filter(id => id !== courseId);
+
+      await axios.put(`${API_URL}/users/${userId}`, {
+        ...userResponse.data,
+        savedCourses: updatedSavedCourses,
+      });
+
+      dispatch({
+        type: DELETE_SAVED_COURSES_SUCCESS,
+        payload: updatedSavedCourses,
+      });
+
+      dispatch({
+        type: FETCH_SAVED_COURSES_SUCCESS,
+        payload: updatedSavedCourses,
+      });
+    } catch (error) {
+      dispatch({
+        type: DELETE_SAVED_COURSES_FAILURE,
+        error: error.message,
+      });
+    }
+  };
+};
 
 export const getShoppingCart = (userId) => {
   return async (dispatch) => {

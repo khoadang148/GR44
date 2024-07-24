@@ -1,11 +1,12 @@
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Flex, Progress } from "antd";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const TestResult = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const { right, wrong, total } = state || { right: 0, wrong: 0, total: 0 };
 
   const handleCertificationCenter = () => {
     navigate("/certificationcenter");
@@ -14,6 +15,7 @@ const TestResult = () => {
   const handleHome = () => {
     navigate("/home");
   };
+
   return (
     <div className="">
       <div className="text-black bg-white ">
@@ -37,27 +39,26 @@ const TestResult = () => {
         </div>
       </div>
       <div>
-        <div className="ml-[500px] mt-[50px] ">
-          <Flex gap="small" wrap>
-            <Progress type="circle" percent={100} />
-            <Progress
-              type="circle"
-              percent={25}
-              status="exception"
-              className="px-[80px] -"
-            />
-            <Progress type="circle" percent={75} />
-          </Flex>
-        </div>
-        <div className="flex ml-[520px] mt-[10px] text-[#333333] font-medium">
-          <div>
-            <h1 className="text-[18px]">Right (15)</h1>
+        <div className="flex ml-[60px] mt-[60px] text-[#333333] font-medium justify-center items-center">
+          <div className="flex flex-col items-center space-y-[20px]">
+            <div className="rounded-full bg-green-600 w-[130px] h-[130px] flex items-center justify-center  text-white">
+              <span className="text-[30px]">
+                {Math.round((right / total) * 100)}%
+              </span>
+            </div>
+            <h1 className="text-[18px]">Right ({right})</h1>
           </div>
-          <div className="px-[130px] text-[18px]">
-            <h1>Wrong (5)</h1>
+          <div className="px-[130px] text-[18px] flex flex-col items-center space-y-[20px]">
+            <div className="rounded-full bg-red-600 w-[130px] h-[130px] flex items-center justify-center  text-white">
+              <span className="text-[30px]">X</span>
+            </div>
+            <h1>Wrong ({wrong})</h1>
           </div>
-          <div className="text-[18px]">
-            <h1>Out Of 20</h1>
+          <div className="text-[18px] flex flex-col items-center space-y-[20px]">
+            <div className="rounded-full bg-blue-600 w-[130px] h-[130px] flex items-center justify-center text-[30px] text-white">
+              {right}
+            </div>
+            <h1>Out Of {total}</h1>
           </div>
         </div>
         <h1 className="text-[42px] text-black ml-[530px] mt-[50px] font-bold">

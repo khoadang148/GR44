@@ -5,13 +5,20 @@ import {
   deleteCertificate,
 } from "../redux/actions/certificate.action";
 import { Button, Image } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const MyCertificates = ({ sidebar }) => {
+  const navigate = useNavigate();
+  const handleAddCertificates1 = () => {
+    navigate("/certificationcenter");
+  };
   const userId = useSelector((state) => state.auth.id);
   const dispatch = useDispatch();
-  const { certificates, loading, error } = useSelector(
-    (state) => state.certificates
-  );
+  const {
+    certificates = [],
+    loading,
+    error,
+  } = useSelector((state) => state.certificates);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
@@ -87,7 +94,10 @@ const MyCertificates = ({ sidebar }) => {
         <h1 className="text-3xl font-normal mt-[9px]">
           Jump Into New Certificate
         </h1>
-        <Button className="text-white font-medium border rounded-[4px] bg-[#ed2a26] border-[#ed2a26] hover:bg-black px-5 py-[11px] absolute right-14">
+        <Button
+          className="text-white font-medium border rounded-[4px] bg-[#ed2a26] border-[#ed2a26] hover:bg-black px-5 py-[11px] absolute right-14"
+          onClick={handleAddCertificates1}
+        >
           New Certificate
         </Button>
       </div>
