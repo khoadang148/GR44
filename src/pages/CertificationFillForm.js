@@ -156,7 +156,7 @@ const CertificationFillForm = () => {
     if (React.isValidElement(label)) {
       const text = React.Children.toArray(label.props.children)
         .filter(child => typeof child === 'string')
-        .join(''); // Join all text parts into a single string
+        .join(''); 
       return text || "";
     }
     return "";
