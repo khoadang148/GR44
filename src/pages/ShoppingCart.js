@@ -54,7 +54,7 @@ const ShoppingCart = () => {
           {hours} hours
         </span>
       </div>
-      <div className="ml-4 flex flex-col justify-between">
+      <div className="ml-4 flex flex-col justify-between w-[60%]">
         <div className="flex justify-between items-center mt-2">
           <span className="text-[#686f7a] text-[12px]">
             {views} • {date}
@@ -82,7 +82,7 @@ const ShoppingCart = () => {
               <FontAwesomeIcon icon={faTrashCan} />
             </button>
           </div>
-          <div className="ml-[100px]">
+          <div>
             <div className="text-[18px] font-bold">${price}</div>
           </div>
         </div>

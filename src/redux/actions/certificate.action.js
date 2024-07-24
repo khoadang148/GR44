@@ -1,6 +1,8 @@
 import axios from "axios";
 import {
- 
+  ADD_NEW_CERTIFICATES_FAILURE,
+  ADD_NEW_CERTIFICATES_REQUEST,
+  ADD_NEW_CERTIFICATES_SUCCESS,
   DELETE_CERTIFICATES_FAILURE,
   DELETE_CERTIFICATES_REQUEST,
   DELETE_CERTIFICATES_SUCCESS,
@@ -87,4 +89,40 @@ export const deleteCertificate = (userId, certificateId) => {
     }
   };
 };
+export const addCertificate = (userId, newCertificate) => {
+  return async (dispatch) => {
+    dispatch({ type: ADD_NEW_CERTIFICATES_REQUEST });
+    try {
+      const userResponse = await axios.get(`${API_URL_USER}/users/${userId}`);
+      const certificates = userResponse.data.certificates || [];
 
+      const updatedCertificates = [...certificates, newCertificate.itemNo];
+
+      await axios.put(`${API_URL_USER}/users/${userId}`, {
+        ...userResponse.data,
+        certificates: updatedCertificates,
+      });
+
+      await axios.post(`${API_URL}/certificates`, newCertificate);
+
+      const updatedUserResponse = await axios.get(
+        `${API_URL_USER}/users/${userId}`
+      );
+      const updatedCertificatesIds = updatedUserResponse.data.certificates;
+
+      const certificatesResponse = await axios.get(`${API_URL}/certificates`, {
+        params: { itemNo: updatedCertificatesIds.join(",") },
+      });
+
+      dispatch({
+        type: ADD_NEW_CERTIFICATES_SUCCESS,
+        payload: certificatesResponse.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: ADD_NEW_CERTIFICATES_FAILURE,
+        error: error.message,
+      });
+    }
+  };
+};

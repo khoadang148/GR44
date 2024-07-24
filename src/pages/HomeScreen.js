@@ -438,7 +438,7 @@ const HomeScreen = () => {
                               }`}
                             />
                           </button>
-                          <h3>{course.price}</h3>
+                          <h3>${course.price}</h3>
                         </div>
                       </div>
                     </div>

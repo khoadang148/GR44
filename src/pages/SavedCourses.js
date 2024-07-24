@@ -1,11 +1,15 @@
 import { ShoppingCartOutlined } from "@ant-design/icons";
-import { faStar } from "@fortawesome/free-regular-svg-icons";
+import { faStar, faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Image } from "react-bootstrap";
-import { deleteSavedCourses, getSavedCourses } from "../redux/actions/course.action";
+import {
+  deleteSavedCourseByCourseId,
+  deleteSavedCourses,
+  getSavedCourses,
+} from "../redux/actions/course.action";
 
 const CourseCard = ({
   thumbnail,
@@ -21,6 +25,8 @@ const CourseCard = ({
   hoveredCourse,
   handleMouseEnter,
   handleMouseLeave,
+  handleDeleteCourse, // New prop
+  courseId, // New prop for course ID
 }) => (
   <div
     className="flex border p-[10px] rounded-sm shadow-md relative"
@@ -30,7 +36,7 @@ const CourseCard = ({
     <div className="relative w-[350px] h-full">
       <div>
         <Image
-          src={thumbnail || ''}
+          src={thumbnail || ""}
           className="w-[350px] h-[180px] object-cover rounded-sm"
         />
       </div>
@@ -46,7 +52,7 @@ const CourseCard = ({
         {hours} hours
       </span>
     </div>
-    <div className="ml-4 flex flex-col justify-between">
+    <div className="ml-4 flex flex-col justify-between w-[60%]">
       <div className="flex justify-between items-center mt-2">
         <span className="text-[#686f7a] text-[12px]">
           {views} • {date}
@@ -70,9 +76,15 @@ const CourseCard = ({
             index === hoveredCourse ? "block" : "hidden"
           }`}
         >
-          <ShoppingCartOutlined className="text-black text-[18px]" />
+          <div className="space-x-6">
+            <ShoppingCartOutlined className="text-black text-[18px]" />
+            <FontAwesomeIcon
+              icon={faTrashCan}
+              onClick={() => handleDeleteCourse(courseId)}
+            />
+          </div>
         </div>
-        <div className="text-[18px] font-bold">{price}</div>
+        <div className="text-[18px] font-bold">${price}</div>
       </div>
     </div>
   </div>
@@ -81,7 +93,9 @@ const CourseCard = ({
 const SavedCourses = ({ sidebar }) => {
   const [hoveredCourse, setHoveredCourse] = useState(null);
   const userId = useSelector((state) => state.auth.id);
-  const savedCourses = useSelector((state) => state.enrolledCourses.savedCourses);
+  const savedCourses = useSelector(
+    (state) => state.enrolledCourses.savedCourses
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -92,8 +106,8 @@ const SavedCourses = ({ sidebar }) => {
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
-  const handleDeleteCourse = () => {
-    setShowDeleteConfirmation(true);
+  const handleDeleteCourse = (courseId) => {
+    dispatch(deleteSavedCourseByCourseId(userId, courseId));
   };
 
   const handleConfirmDelete = () => {
@@ -114,7 +128,8 @@ const SavedCourses = ({ sidebar }) => {
   };
 
   const handleRemoveAll = () => {
-    setShowDeleteConfirmation(true);
+    // Implement logic to remove all saved courses
+    dispatch(deleteSavedCourses(userId));
   };
 
   return (
@@ -122,13 +137,16 @@ const SavedCourses = ({ sidebar }) => {
       <div className="col-span-1 w-[400px]">
         <div className="flex justify-between items-center">
           <h2 className="text-base font-medium">Saved Courses</h2>
-          <button className="text-sm text-gray-700 font-normal" onClick={handleRemoveAll}>
+          <button className="text-sm text-gray-700 font-normal">
             Remove All
           </button>
         </div>
         <hr className="my-2" />
         <p className="text-gray-500 text-sm">{savedCourses.length} Courses</p>
-        <button className="bg-[#ED2927] hover:bg-[#333333] text-white w-full py-2 rounded-sm mt-4" onClick={handleRemoveAll}>
+        <button
+          className="bg-[#ED2927] hover:bg-[#333333] text-white w-full py-2 rounded-sm mt-4"
+          onClick={handleRemoveAll}
+        >
           <FontAwesomeIcon icon={faTrashAlt} className="mr-2" />
           <span className="text-sm">Remove Saved Courses</span>
         </button>
@@ -158,26 +176,29 @@ const SavedCourses = ({ sidebar }) => {
         }`}
       >
         <h1 className="text-xl font-medium">Saved Courses</h1>
-        {savedCourses.map((course, index) => (
-          course && (
-            <CourseCard
-              key={course.id}
-              thumbnail={course.thumbnail}
-              rate={course.rate}
-              title={course.title}
-              category={course.category}
-              instructor={course.instructor}
-              hours={course.hours}
-              price={course.price}
-              views={course.views}
-              date={course.date}
-              index={index}
-              hoveredCourse={hoveredCourse}
-              handleMouseEnter={handleMouseEnter}
-              handleMouseLeave={handleMouseLeave}
-            />
-          )
-        ))}
+        {savedCourses.map(
+          (course, index) =>
+            course && (
+              <CourseCard
+                key={course.id}
+                courseId={course.id}
+                thumbnail={course.thumbnail}
+                rate={course.rate}
+                title={course.title}
+                category={course.category}
+                instructor={course.instructor}
+                hours={course.hours}
+                price={course.price}
+                views={course.views}
+                date={course.date}
+                index={index}
+                hoveredCourse={hoveredCourse}
+                handleMouseEnter={handleMouseEnter}
+                handleMouseLeave={handleMouseLeave}
+                handleDeleteCourse={handleDeleteCourse}
+              />
+            )
+        )}
       </div>
     </div>
   );

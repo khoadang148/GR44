@@ -1,4 +1,7 @@
 import {
+  ADD_NEW_CERTIFICATES_FAILURE,
+  ADD_NEW_CERTIFICATES_REQUEST,
+  ADD_NEW_CERTIFICATES_SUCCESS,
   DELETE_CERTIFICATES_FAILURE,
   DELETE_CERTIFICATES_REQUEST,
   DELETE_CERTIFICATES_SUCCESS,
@@ -56,6 +59,27 @@ const certificatesReducer = (state = initialState, action) => {
         loading: false,
         error: action.error,
       };
+      case ADD_NEW_CERTIFICATES_REQUEST:
+        return {
+          ...state,
+          loading: true,
+          error: null,
+        };
+      case ADD_NEW_CERTIFICATES_SUCCESS:
+        
+        return {
+          ...state,
+          certificates: [...state.certificates, action.payload],
+          loading: false,
+          error: null,
+        };
+      case ADD_NEW_CERTIFICATES_FAILURE:
+        return {
+          ...state,
+          loading: false,
+          error: action.error,
+        };
+  
 
     default:
       return state;

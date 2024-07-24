@@ -8,6 +8,10 @@ const CertificationCenter = () => {
     navigate('/home');
   };
 
+  const handleAddCertificates2 = () => {
+    navigate("/certificationfillform");
+  };
+
   const [certificateNumber, setCertificateNumber] = useState('');
   const [fullName, setFullName] = useState('');
   const [category, setCategory] = useState('');
@@ -120,7 +124,7 @@ const CertificationCenter = () => {
               alt="Cert Icon"
             />
           </div>
-          <button className="mt-10 bg-red-500 text-white px-14 py-2 hover:bg-red-600 transition duration-300">Start Certification</button>
+          <button className="mt-10 bg-red-500 text-white px-14 py-2 hover:bg-red-600 transition duration-300 " onClick={handleAddCertificates2}>Start Certification</button>
         </div>
             <img
               className="absolute inset-0 z-0 h-full w-full object-cover object-center filter blur-[2px] brightness-50"
