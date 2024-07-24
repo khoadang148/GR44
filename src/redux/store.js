@@ -15,6 +15,9 @@ import earningReducer from "./reducers/earning.reducer";
 import verificationReducer from "./reducers/verification.reducer"; 
 import analysisReducer from "./reducers/analysis.reducer";
 import messageReducer from "./reducers/messageReducer";
+import invoiceReducer from "./reducers/invoice.reducer";
+
+
 const rootReducer = combineReducers({
   auth: authReducer,
   enrolledCourses: enrolledCoursesReducer,
@@ -30,6 +33,7 @@ const rootReducer = combineReducers({
   verification: verificationReducer,
   analysis: analysisReducer,
   messages: messageReducer,
+  invoice: invoiceReducer,
 });
 
 const store = createStore(
