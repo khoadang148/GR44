@@ -98,7 +98,7 @@ const ShoppingCart = () => {
   const navigate = useNavigate();
 
   const handleCheckout = () => {
-    navigate("/checkout");
+    navigate("/checkout", { state: { totalPrice } });
   };
 
   const [hoveredCourse, setHoveredCourse] = useState(null);
