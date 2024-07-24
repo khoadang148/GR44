@@ -29,7 +29,7 @@ const Checkout = () => {
     console.log(`selected ${value}`);
   };
   const handleInvoice = () => {
-    navigate("/invoice");
+    navigate("/invoice" , { state: { totalPrice } });
   };
   const [firstName, setFirstName] = useState(
     localStorage.getItem("firstName") || ""
@@ -724,7 +724,7 @@ const Checkout = () => {
             </div>
           </form>
           <div className="text-[#787878] bg-white h-auto w-[320px] mt-5 ml-5">
-            <p>{firstName}</p>
+            <p>{firstName}{lastName}</p>
             <p>{academyname}</p>
             <p>{phonenumber}</p>
           </div>
