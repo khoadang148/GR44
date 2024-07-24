@@ -64,11 +64,19 @@ const LoginScreen = () => {
   const handleSocialLogin = async (providerName) => {
     setLoading(true);
     try {
+      // Gửi yêu cầu đăng nhập qua mạng xã hội
       const resultAction = await dispatch(socialLogin({ providerName })).unwrap();
-      // Ghi nhận thông tin người dùng và chuyển hướng
       if (resultAction) {
-        // Thực hiện các hành động cần thiết sau khi đăng nhập thành công
-        navigate("/home");
+        const { token, user } = resultAction;
+  
+        // Lưu token vào Cookies
+        Cookies.set("token", token, { expires: 7 });
+  
+        // Lưu thông tin người dùng vào localStorage hoặc Redux store nếu cần
+        localStorage.setItem("user", JSON.stringify(user));
+  
+        // Chuyển hướng đến trang home
+        navigate("/home", { replace: true });
       }
     } catch (error) {
       console.error("Social login error:", error);
@@ -76,6 +84,7 @@ const LoginScreen = () => {
       setLoading(false);
     }
   };
+  
   
 
   const goToSignUp = () => {
