@@ -1,35 +1,38 @@
-import {FETCH_ANALYSIS_REQUEST,
-  FETCH_ANALYSIS_SUCCESS,
-  FETCH_ANALYSIS_FAILURE, } from '../actionType';
-
-const initialState = {
-  data: {},
-  status: 'idle',
-  error: null,
-};
-
-const analysisReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case FETCH_ANALYSIS_REQUEST:
-      return {
-        ...state,
-        status: 'loading',
-      };
-    case FETCH_ANALYSIS_SUCCESS:
-      return {
-        ...state,
-        status: 'succeeded',
-        data: action.payload,
-      };
-    case FETCH_ANALYSIS_FAILURE:
-      return {
-        ...state,
-        status: 'failed',
-        error: action.error,
-      };
-    default:
-      return state;
-  }
-};
-
-export default analysisReducer;
+import {
+    FETCH_ANALYSIS_DATA_REQUEST,
+    FETCH_ANALYSIS_DATA_SUCCESS,
+    FETCH_ANALYSIS_DATA_FAILURE,
+  } from '../actions/analysis.action';
+  
+  const initialState = {
+    loading: false,
+    data: null,
+    error: null,
+  };
+  
+  const analysisReducer = (state = initialState, action) => {
+    switch (action.type) {
+      case FETCH_ANALYSIS_DATA_REQUEST:
+        return {
+          ...state,
+          loading: true,
+        };
+      case FETCH_ANALYSIS_DATA_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          data: action.payload,
+        };
+      case FETCH_ANALYSIS_DATA_FAILURE:
+        return {
+          ...state,
+          loading: false,
+          error: action.payload,
+        };
+      default:
+        return state;
+    }
+  };
+  
+  export default analysisReducer;
+  
