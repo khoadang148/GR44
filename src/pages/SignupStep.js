@@ -11,7 +11,7 @@ const SignupStep = () => {
   const [isInstructor, setIsInstructor] = useState(true);
   const [isLoading, setLoading] = useState(false);
   const [bio, setBio] = useState('');
-  const [signupSuccess, setSignupSuccess] = useState(false); // State for signup success notification
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { users } = useSelector((state) => state.auth);
@@ -33,8 +33,11 @@ const SignupStep = () => {
       const maxId = getMaxId(users);
       const role = isInstructor ? 'teacher' : 'student';
       await dispatch(updateUserRole(maxId, role));
-      setSignupSuccess(true); // Set signup success state
+      setSignupSuccess(true);
       setLoading(false);
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000); // Chuyển hướng sau 2 giây
     } catch (error) {
       setLoading(false);
       console.error('Failed to update user role:', error);
@@ -76,7 +79,7 @@ const SignupStep = () => {
           </div>
 
           {signupSuccess && (
-            <p className="text-green-500 text-center my-2">Account created successfully!</p>
+            <p className="text-green-500 text-center my-2">Account created successfully! Redirecting to login...</p>
           )}
 
           {isInstructor ? (

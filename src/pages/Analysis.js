@@ -400,7 +400,7 @@ const Analysis = () => {
             <BarChart
               width={450}
               height={100}
-              data={data}
+              data={dataa}
               margin={{ right: 10, left: 10 }}
             >
               <Tooltip
